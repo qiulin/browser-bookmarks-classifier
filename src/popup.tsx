@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { InitPage } from './components/Initialization/InitPage';
+import { PopupInitPage } from './components/Initialization/PopupInitPage';
 import { useStorage } from './hooks/useStorage';
 import './popup.css';
 
@@ -38,7 +38,7 @@ const PopupApp: React.FC = () => {
       </nav>
 
       <main className="popup-main">
-        <InitPage />
+        <PopupInitPage />
       </main>
     </div>
   );

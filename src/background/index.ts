@@ -74,6 +74,9 @@ async function handleMessage(message: Message): Promise<any> {
     case 'START_INITIALIZATION':
       return startInitialization();
 
+    case 'STOP_INITIALIZATION':
+      return stopInitialization();
+
     case 'GET_PROGRESS':
       return storageService.getProgress();
 
@@ -124,6 +127,20 @@ async function startInitialization(): Promise<void> {
   }).catch(error => {
     console.error('Initialization failed:', error);
     throw error;
+  });
+}
+
+/**
+ * Stop initialization mode
+ */
+async function stopInitialization(): Promise<void> {
+  classifierService.abort();
+  await storageService.setConfig({ isProcessing: false });
+  await storageService.setProgress({
+    current: 0,
+    total: 0,
+    message: 'Initialization stopped by user',
+    stage: 'idle',
   });
 }
 

@@ -7,7 +7,10 @@ import './options.css';
 
 const OptionsApp: React.FC = () => {
   const { loading } = useStorage();
-  const [activeTab, setActiveTab] = React.useState<'config' | 'init'>('config');
+  // Get initial tab from URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTab = urlParams.get('tab') === 'init' ? 'init' : 'config';
+  const [activeTab, setActiveTab] = React.useState<'config' | 'init'>(initialTab);
 
   if (loading) {
     return <div className="options-container loading">Loading...</div>;

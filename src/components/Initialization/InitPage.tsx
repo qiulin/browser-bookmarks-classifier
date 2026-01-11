@@ -7,9 +7,10 @@ type Stage = 'idle' | 'confirm' | 'processing' | 'complete' | 'error';
 
 export const InitPage: React.FC = () => {
   const { config, progress } = useStorage();
-  const { startInitialization, loading } = useMessageHandler();
+  const { startInitialization, stopInitialization, loading } = useMessageHandler();
   const [stage, setStage] = useState<Stage>('idle');
   const [exporting, setExporting] = useState(false);
+  const [stopping, setStopping] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,6 +57,18 @@ export const InitPage: React.FC = () => {
 
   const handleCancel = () => {
     setStage('idle');
+  };
+
+  const handleStop = async () => {
+    setStopping(true);
+    try {
+      await stopInitialization();
+      setStage('idle');
+    } catch (err) {
+      console.error('Failed to stop initialization:', err);
+    } finally {
+      setStopping(false);
+    }
   };
 
   const getProgressPercentage = () => {
@@ -161,6 +174,16 @@ export const InitPage: React.FC = () => {
           {stage === 'complete' && (
             <button className="btn btn-primary" onClick={() => window.close()}>
               Close
+            </button>
+          )}
+
+          {stage === 'processing' && (
+            <button
+              className="btn btn-secondary"
+              onClick={handleStop}
+              disabled={stopping}
+            >
+              {stopping ? 'Stopping...' : 'Stop Initialization'}
             </button>
           )}
         </div>

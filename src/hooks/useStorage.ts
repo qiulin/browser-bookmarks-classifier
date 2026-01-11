@@ -118,6 +118,10 @@ export function useMessageHandler() {
     return sendMessage('START_INITIALIZATION');
   }
 
+  async function stopInitialization() {
+    return sendMessage('STOP_INITIALIZATION');
+  }
+
   async function getProgress() {
     return sendMessage<ProgressUpdate>('GET_PROGRESS');
   }
@@ -131,6 +135,7 @@ export function useMessageHandler() {
     error,
     sendMessage,
     startInitialization,
+    stopInitialization,
     getProgress,
     exportBookmarks,
   };
