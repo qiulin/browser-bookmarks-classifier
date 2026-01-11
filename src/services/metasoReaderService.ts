@@ -7,7 +7,7 @@ import type { PageContent } from '../types';
  */
 class MetasoReaderService {
   private apiKey: string = '';
-  private baseUrl: string = 'https://r.metaso.ai/api';
+  private baseUrl: string = 'https://metaso.cn/api/v1/reader';
 
   /**
    * Set API key for Metaso AI Reader
