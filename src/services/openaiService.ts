@@ -50,12 +50,14 @@ class OpenAIService {
    * @param samples - Array of page contents from sampled bookmarks
    * @param maxCategories - Maximum number of categories to create
    * @param maxDepth - Maximum directory depth
+   * @param language - Language code for category names (e.g., 'en', 'zh')
    * @returns Array of category paths
    */
   async createCategories(
     samples: Array<{ title: string; url: string; content: string }>,
     maxCategories: number,
-    maxDepth: number
+    maxDepth: number,
+    language: string = 'en'
   ): Promise<string[]> {
     if (!this.isConfigured()) {
       throw new Error('OpenAI API key is not configured');
@@ -70,7 +72,7 @@ class OpenAIService {
 Guidelines:
 - Create up to ${maxCategories} categories
 - Each category should be broad enough to contain multiple bookmarks
-- Use clear, descriptive category names
+- Use clear, descriptive category names in ${this._getLanguageName(language)}
 - Organize categories in a logical hierarchy (max ${maxDepth} levels)
 - Return only JSON in the format: { "categories": ["category1", "category2", ...] }
 
@@ -83,6 +85,25 @@ Example output format: { "categories": ["Technology/Programming", "Technology/AI
       MAX_API_RETRIES,
       RETRY_DELAY_MS
     );
+  }
+
+  /**
+   * Get language name from code
+   */
+  private _getLanguageName(code: string): string {
+    const languageMap: Record<string, string> = {
+      'en': 'English',
+      'zh': 'Chinese (中文)',
+      'ja': 'Japanese (日本語)',
+      'ko': 'Korean (한국어)',
+      'es': 'Spanish (Español)',
+      'fr': 'French (Français)',
+      'de': 'German (Deutsch)',
+      'it': 'Italian (Italiano)',
+      'pt': 'Portuguese (Português)',
+      'ru': 'Russian (Русский)',
+    };
+    return languageMap[code] || 'English';
   }
 
   /**
@@ -123,6 +144,7 @@ Example output format: { "categories": ["Technology/Programming", "Technology/AI
    * @param content - Page content
    * @param existingCategories - List of existing category paths
    * @param maxDepth - Maximum directory depth
+   * @param language - Language code for category names (e.g., 'en', 'zh')
    * @returns Classification result with path and reason
    */
   async classifyBookmark(
@@ -130,7 +152,8 @@ Example output format: { "categories": ["Technology/Programming", "Technology/AI
     url: string,
     content: string,
     existingCategories: string[],
-    maxDepth: number
+    maxDepth: number,
+    language: string = 'en'
   ): Promise<ClassificationResult> {
     if (!this.isConfigured()) {
       throw new Error('OpenAI API key is not configured');
@@ -142,7 +165,7 @@ Instructions:
 - Analyze the bookmark title, URL, and page content
 - Choose the most suitable existing directory from the provided list
 - The directory path should have at most ${maxDepth} levels
-- If no existing directory fits well, you may suggest a new path
+- If no existing directory fits well, you may suggest a new path (use ${this._getLanguageName(language)} for directory names)
 - Return only JSON in the format: { "path": "directory/subdirectory", "reason": "classification reasoning" }`;
 
     const userPrompt = `Bookmark Information:

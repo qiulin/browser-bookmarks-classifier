@@ -23,6 +23,9 @@ export interface ExtensionConfig {
   // TODO Folder Configuration
   todoFolderName: string;      // Default "TODO"
   checkInterval: number;       // Check interval in ms, default 60000 (1 minute)
+
+  // Language Configuration
+  defaultLanguage: string;     // Default language for category names, e.g., 'en', 'zh', 'ja'
 }
 
 // Default configuration
@@ -39,6 +42,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   isProcessing: false,
   todoFolderName: 'TODO',
   checkInterval: 60000, // 1 minute in milliseconds
+  defaultLanguage: 'en', // Default to English
 };
 
 // Bookmark types

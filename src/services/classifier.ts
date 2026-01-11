@@ -124,7 +124,8 @@ class ClassifierService {
     const categories = await openaiService.createCategories(
       validSampleData,
       config.maxCategories,
-      config.maxDirectoryDepth
+      config.maxDirectoryDepth,
+      config.defaultLanguage
     );
 
     // Create category folders
@@ -162,7 +163,8 @@ class ClassifierService {
           existingCategories,
           config.maxDirectoryDepth,
           rootFolderId,
-          signal
+          signal,
+          config.defaultLanguage
         );
 
         // Move to classified folder
@@ -223,7 +225,9 @@ class ClassifierService {
       bookmark,
       categories,
       config.maxDirectoryDepth,
-      rootFolderId
+      rootFolderId,
+      undefined,
+      config.defaultLanguage
     );
   }
 
@@ -235,7 +239,8 @@ class ClassifierService {
     existingCategories: string[],
     maxDepth: number,
     rootFolderId: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    language: string = 'en'
   ): Promise<{ path: string; folderId: string }> {
     // Fetch page content
     const content = await tavilyService.fetchPageContent(bookmark.url!);
@@ -248,7 +253,8 @@ class ClassifierService {
       bookmark.url!,
       content.content,
       existingCategories,
-      maxDepth
+      maxDepth,
+      language
     );
 
     // Get or create target folder

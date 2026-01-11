@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStorage } from '../../hooks/useStorage';
-import { COMMON_LLM_MODELS } from '../../utils/constants';
+import { COMMON_LLM_MODELS, SUPPORTED_LANGUAGES } from '../../utils/constants';
 import './ConfigPage.css';
 
 export const ConfigPage: React.FC = () => {
@@ -20,6 +20,7 @@ export const ConfigPage: React.FC = () => {
     maxDirectoryDepth: 2,
     todoFolderName: 'TODO',
     checkInterval: 60000,
+    defaultLanguage: 'en',
   });
 
   // Update local config when global config loads
@@ -38,6 +39,7 @@ export const ConfigPage: React.FC = () => {
         maxDirectoryDepth: config.maxDirectoryDepth,
         todoFolderName: config.todoFolderName,
         checkInterval: config.checkInterval,
+        defaultLanguage: config.defaultLanguage || 'en',
       });
     }
   }, [config]);
@@ -74,6 +76,7 @@ export const ConfigPage: React.FC = () => {
         maxDirectoryDepth: localConfig.maxDirectoryDepth,
         todoFolderName: localConfig.todoFolderName,
         checkInterval: localConfig.checkInterval,
+        defaultLanguage: localConfig.defaultLanguage,
       });
 
       setMessage({ type: 'success', text: 'Configuration saved successfully!' });
@@ -236,6 +239,22 @@ export const ConfigPage: React.FC = () => {
               value={localConfig.maxCategories}
               onChange={(e) => handleChange('maxCategories', parseInt(e.target.value))}
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="defaultLanguage">Default Language</label>
+            <select
+              id="defaultLanguage"
+              value={localConfig.defaultLanguage}
+              onChange={(e) => handleChange('defaultLanguage', e.target.value)}
+            >
+              {SUPPORTED_LANGUAGES.map(lang => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.name} ({lang.nativeName})
+                </option>
+              ))}
+            </select>
+            <small>Language for category and directory names</small>
           </div>
 
           <div className="form-group">

@@ -36,6 +36,20 @@ export const COMMON_LLM_MODELS = [
   { id: 'deepseek-coder', name: 'DeepSeek Coder', provider: 'DeepSeek' },
 ] as const;
 
+// Supported languages for category names
+export const SUPPORTED_LANGUAGES = [
+  { code: 'en', name: 'English', nativeName: 'English' },
+  { code: 'zh', name: 'Chinese', nativeName: '中文' },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語' },
+  { code: 'ko', name: 'Korean', nativeName: '한국어' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  { code: 'fr', name: 'French', nativeName: 'Français' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch' },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano' },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
+  { code: 'ru', name: 'Russian', nativeName: 'Русский' },
+] as const;
+
 // Default configuration
 export const DEFAULT_CONFIG: ExtensionConfig = {
   openaiBaseUrl: 'https://api.openai.com/v1',
@@ -50,6 +64,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   isProcessing: false,
   todoFolderName: DEFAULT_TODO_FOLDER_NAME,
   checkInterval: 60000, // 1 minute in milliseconds
+  defaultLanguage: 'en', // Default to English
 };
 
 // System prompts for LLM
