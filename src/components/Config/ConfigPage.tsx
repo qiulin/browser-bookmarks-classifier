@@ -28,9 +28,9 @@ export const ConfigPage: React.FC = () => {
     if (config) {
       const isCustomModel = !COMMON_LLM_MODELS.some(m => m.id === config.llmModel);
       setCustomModel(isCustomModel);
-      // Filter out 'Backup' from display since it's always included
+      // Filter out 'Backup' and 'Failures' from display since they're always included
       const excludedDirsDisplay = config.excludedDirs
-        .filter(d => d !== 'Backup')
+        .filter(d => d !== 'Backup' && d !== 'Failures')
         .join(', ');
       setLocalConfig({
         openaiBaseUrl: config.openaiBaseUrl,
@@ -69,9 +69,12 @@ export const ConfigPage: React.FC = () => {
         .map(s => s.trim())
         .filter(s => s.length > 0);
 
-      // Always include 'Backup' in excluded directories
-      if (!excludedDirsArray.includes('Backup')) {
-        excludedDirsArray = ['Backup', ...excludedDirsArray];
+      // Always include 'Backup' and 'Failures' in excluded directories
+      const alwaysExcluded = ['Backup', 'Failures'];
+      for (const folder of alwaysExcluded) {
+        if (!excludedDirsArray.includes(folder)) {
+          excludedDirsArray = [folder, ...excludedDirsArray];
+        }
       }
 
       await updateConfig({
@@ -288,7 +291,7 @@ export const ConfigPage: React.FC = () => {
               onChange={(e) => handleChange('excludedDirs', e.target.value)}
               placeholder="Personal, Work"
             />
-            <small>Comma-separated folder names to exclude from classification (Backup is always excluded)</small>
+            <small>Comma-separated folder names to exclude from classification (Backup and Failures are always excluded)</small>
           </div>
         </section>
 

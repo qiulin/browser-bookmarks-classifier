@@ -2,7 +2,7 @@ import { tavilyService } from './tavilyService';
 import { openaiService } from './openaiService';
 import { bookmarkService } from './bookmarkService';
 import { storageService } from './storage';
-import { BATCH_SIZE } from '../utils/constants';
+import { BATCH_SIZE, FAILURES_FOLDER_NAME } from '../utils/constants';
 import { sampleArray, batchArray, sleep } from '../utils/helpers';
 import type { ProgressUpdate, ExtensionConfig } from '../types';
 
@@ -146,7 +146,14 @@ class ClassifierService {
       stage: 'classifying',
     });
 
+    // Create Failures folder
+    const failuresFolderId = await bookmarkService.createFolderPath(
+      FAILURES_FOLDER_NAME,
+      rootFolderId
+    );
+
     let classified = 0;
+    let failed = 0;
     const existingCategories = Object.keys(categoryIds);
 
     for (const bookmark of allBookmarks) {
@@ -179,15 +186,25 @@ class ClassifierService {
         });
       } catch (error) {
         console.error(`Failed to classify bookmark ${bookmark.title}:`, error);
+        // Move to Failures folder
+        try {
+          await bookmarkService.moveBookmark(bookmark.id!, failuresFolderId);
+          failed++;
+        } catch (moveError) {
+          console.error(`Failed to move bookmark to Failures folder:`, moveError);
+        }
         classified++;
       }
     }
 
     // Complete
+    const successMessage = failed > 0
+      ? `Classification complete! ${failed} bookmarks moved to Failures folder.`
+      : 'Classification complete!';
     progressCallback?.({
       current: total,
       total,
-      message: 'Classification complete!',
+      message: successMessage,
       stage: 'complete',
     });
 
