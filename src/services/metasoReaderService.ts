@@ -44,15 +44,15 @@ class MetasoReaderService {
    * Internal method to fetch page content
    */
   private async _fetchPageContent(url: string): Promise<PageContent> {
-    const response = await fetch(`${this.baseUrl}/read`, {
+    const response = await fetch(this.baseUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.apiKey}`,
+        'Accept': 'text/plain',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         url: url,
-        extract: 'content',
       }),
     });
 
@@ -63,40 +63,49 @@ class MetasoReaderService {
       );
     }
 
-    const data = await response.json();
+    // Metaso returns plain text (markdown format)
+    const text = await response.text();
 
-    // Extract content from response
-    const content = data.content || data.text || data.markdown || '';
-    const title = data.title || this._extractTitleFromUrl(url);
-
-    // Clean up content
-    const cleanedContent = this._cleanContent(content);
+    // Extract title and content from the response
+    const { title, content } = this._parseResponse(text, url);
 
     return {
       title,
-      content: cleanedContent,
+      content,
       url,
     };
   }
 
   /**
-   * Extract title from URL
+   * Parse response to extract title and content
    */
-  private _extractTitleFromUrl(url: string): string {
-    try {
-      const urlObj = new URL(url);
-      return urlObj.hostname;
-    } catch {
-      return url;
+  private _parseResponse(text: string, url: string): { title: string; content: string } {
+    // Try to extract title from markdown heading
+    const titleMatch = text.match(/^#\s+(.+)$/m);
+    let title = titleMatch ? titleMatch[1].trim() : '';
+
+    // If no title found, extract from URL
+    if (!title) {
+      try {
+        const urlObj = new URL(url);
+        title = urlObj.hostname;
+      } catch {
+        title = url;
+      }
     }
+
+    // Clean up content
+    const content = this._cleanContent(text);
+
+    return { title, content };
   }
 
   /**
    * Clean content
    */
   private _cleanContent(content: string): string {
-    // Remove excessive whitespace
-    let cleaned = content.replace(/\s+/g, ' ').trim();
+    // Remove excessive whitespace while preserving paragraph structure
+    let cleaned = content.replace(/\n{3,}/g, '\n\n').trim();
 
     // Limit to reasonable size for LLM processing
     const maxLength = 10000;
