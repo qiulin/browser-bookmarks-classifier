@@ -28,6 +28,10 @@ export const ConfigPage: React.FC = () => {
     if (config) {
       const isCustomModel = !COMMON_LLM_MODELS.some(m => m.id === config.llmModel);
       setCustomModel(isCustomModel);
+      // Filter out 'Backup' from display since it's always included
+      const excludedDirsDisplay = config.excludedDirs
+        .filter(d => d !== 'Backup')
+        .join(', ');
       setLocalConfig({
         openaiBaseUrl: config.openaiBaseUrl,
         openaiApiKey: config.openaiApiKey,
@@ -35,7 +39,7 @@ export const ConfigPage: React.FC = () => {
         tavilyApiKey: config.tavilyApiKey,
         initSampleRate: config.initSampleRate,
         maxCategories: config.maxCategories,
-        excludedDirs: config.excludedDirs.join(', '),
+        excludedDirs: excludedDirsDisplay,
         maxDirectoryDepth: config.maxDirectoryDepth,
         todoFolderName: config.todoFolderName,
         checkInterval: config.checkInterval,
@@ -60,10 +64,15 @@ export const ConfigPage: React.FC = () => {
     setMessage(null);
 
     try {
-      const excludedDirsArray = localConfig.excludedDirs
+      let excludedDirsArray = localConfig.excludedDirs
         .split(',')
         .map(s => s.trim())
         .filter(s => s.length > 0);
+
+      // Always include 'Backup' in excluded directories
+      if (!excludedDirsArray.includes('Backup')) {
+        excludedDirsArray = ['Backup', ...excludedDirsArray];
+      }
 
       await updateConfig({
         openaiBaseUrl: localConfig.openaiBaseUrl,
@@ -277,9 +286,9 @@ export const ConfigPage: React.FC = () => {
               type="text"
               value={localConfig.excludedDirs}
               onChange={(e) => handleChange('excludedDirs', e.target.value)}
-              placeholder="Archive, Personal, Work"
+              placeholder="Personal, Work"
             />
-            <small>Comma-separated folder names to exclude from classification</small>
+            <small>Comma-separated folder names to exclude from classification (Backup is always excluded)</small>
           </div>
         </section>
 
