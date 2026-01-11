@@ -72,9 +72,9 @@ Guidelines:
 - Each category should be broad enough to contain multiple bookmarks
 - Use clear, descriptive category names
 - Organize categories in a logical hierarchy (max ${maxDepth} levels)
-- Return only a JSON array of category path strings
+- Return only JSON in the format: { "categories": ["category1", "category2", ...] }
 
-Example output format: ["Technology/Programming", "Technology/AI", "Design/Graphics", "Business/Marketing"]`;
+Example output format: { "categories": ["Technology/Programming", "Technology/AI", "Design/Graphics", "Business/Marketing"] }`;
 
     const userPrompt = `Based on these bookmark samples, create appropriate categories:\n\n${samplesText}`;
 
@@ -95,12 +95,20 @@ Example output format: ["Technology/Programming", "Technology/AI", "Design/Graph
     ]);
 
     // Parse JSON response
-    const content = response.choices[0]?.message?.content || '[]';
+    const content = response.choices[0]?.message?.content || '{}';
     try {
-      const categories = JSON.parse(content);
-      if (!Array.isArray(categories)) {
-        throw new Error('Response is not an array');
+      const parsed = JSON.parse(content);
+
+      // Handle both formats: direct array or object with "categories" key
+      let categories: string[];
+      if (Array.isArray(parsed)) {
+        categories = parsed;
+      } else if (parsed.categories && Array.isArray(parsed.categories)) {
+        categories = parsed.categories;
+      } else {
+        throw new Error('Response does not contain a categories array');
       }
+
       return categories.map((cat: string) => String(cat));
     } catch (error) {
       console.error('Failed to parse categories response:', content);
