@@ -180,11 +180,6 @@ function startTodoCheck(config: any) {
   // Clear existing timer if any
   stopTodoCheck();
 
-  // Only start if initialization is complete
-  if (!config.isInitialized) {
-    return;
-  }
-
   // Check immediately on start
   checkTodoFolder(config);
 
@@ -209,8 +204,8 @@ function stopTodoCheck() {
  */
 async function checkTodoFolder(config: any) {
   try {
-    // Only proceed if initialization is complete and not processing
-    if (!config.isInitialized || config.isProcessing) {
+    // Only proceed if not processing (allow TODO monitoring even without initialization)
+    if (config.isProcessing) {
       return;
     }
 
