@@ -28,9 +28,25 @@ export default defineConfig({
         background: resolve(__dirname, 'src/background/index.ts'),
       },
       output: {
-        entryFileNames: '[name].js',
+        entryFileNames: (chunkInfo) => {
+          // Keep entry file names consistent
+          if (chunkInfo.name === 'popup' || chunkInfo.name === 'options' || chunkInfo.name === 'background') {
+            return '[name].js';
+          }
+          return '[name].js';
+        },
         chunkFileNames: '[name].js',
         assetFileNames: '[name].[ext]',
+        // Manual chunks to prevent shared chunks between entries
+        manualChunks: (id) => {
+          // Don't create shared chunks for our entry points
+          if (id.includes('node_modules')) {
+            // Vendor chunks are OK to share
+            return 'vendor';
+          }
+          // Return undefined to let each entry have its own chunks
+          return undefined;
+        },
       },
     },
   },

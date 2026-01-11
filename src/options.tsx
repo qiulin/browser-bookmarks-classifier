@@ -47,8 +47,14 @@ const OptionsApp: React.FC = () => {
   );
 };
 
-ReactDOM.createRoot(document.getElementById('options-root')!).render(
-  <React.StrictMode>
-    <OptionsApp />
-  </React.StrictMode>
-);
+// Safely create root - prevent duplicate createRoot calls
+const rootElement = document.getElementById('options-root');
+if (rootElement && !(rootElement as any)._reactRoot) {
+  const root = ReactDOM.createRoot(rootElement);
+  (rootElement as any)._reactRoot = root;
+  root.render(
+    <React.StrictMode>
+      <OptionsApp />
+    </React.StrictMode>
+  );
+}

@@ -44,8 +44,14 @@ const PopupApp: React.FC = () => {
   );
 };
 
-ReactDOM.createRoot(document.getElementById('popup-root')!).render(
-  <React.StrictMode>
-    <PopupApp />
-  </React.StrictMode>
-);
+// Safely create root - prevent duplicate createRoot calls
+const rootElement = document.getElementById('popup-root');
+if (rootElement && !(rootElement as any)._reactRoot) {
+  const root = ReactDOM.createRoot(rootElement);
+  (rootElement as any)._reactRoot = root;
+  root.render(
+    <React.StrictMode>
+      <PopupApp />
+    </React.StrictMode>
+  );
+}
