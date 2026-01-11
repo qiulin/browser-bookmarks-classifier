@@ -378,11 +378,11 @@ class ClassifierService {
 
   /**
    * Clean up empty folders after classification
-   * @param rootFolderId - Root folder ID to start cleanup from
+   * @param _rootFolderId - Root folder ID (unused, kept for interface consistency)
    * @param excludeFolders - Folder names to exclude from cleanup
    */
   private async _cleanupEmptyFolders(
-    rootFolderId: string,
+    _rootFolderId: string,
     excludeFolders: string[]
   ): Promise<void> {
     const tree = await bookmarkService.getTree();
