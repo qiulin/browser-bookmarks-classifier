@@ -77,10 +77,17 @@ export function joinPath(parts: string[]): string {
   return parts.filter(p => p.trim().length > 0).join('/');
 }
 
-// Sample array based on rate
+// Sample array based on rate using Fisher-Yates shuffle
 export function sampleArray<T>(array: T[], rate: number): T[] {
   const sampleSize = Math.max(1, Math.floor(array.length * rate));
-  const shuffled = [...array].sort(() => Math.random() - 0.5);
+  const shuffled = [...array];
+
+  // Fisher-Yates shuffle algorithm
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
   return shuffled.slice(0, sampleSize);
 }
 
