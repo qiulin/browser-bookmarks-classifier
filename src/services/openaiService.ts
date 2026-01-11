@@ -64,21 +64,65 @@ class OpenAIService {
     }
 
     const samplesText = samples
-      .map((s, i) => `${i + 1}. Title: ${s.title}\n   URL: ${s.url}\n   Content: ${s.content.substring(0, 200)}...`)
+      .map((s, i) => `${i + 1}. Title: ${s.title}\n   URL: ${s.url}\n   Content: ${s.content.substring(0, 1000)}...`)
       .join('\n\n');
 
-    const systemPrompt = `You are a bookmark categorization assistant. Analyze the provided bookmark samples and create appropriate category directories.
+    const systemPrompt = `You are an expert bookmark categorization assistant. Your task is to analyze bookmark samples and create a logical category hierarchy.
 
-Guidelines:
-- Create up to ${maxCategories} categories
-- Each category should be broad enough to contain multiple bookmarks
-- Use clear, descriptive category names in ${this._getLanguageName(language)}
-- Organize categories in a logical hierarchy (max ${maxDepth} levels)
-- Return only JSON in the format: { "categories": ["category1", "category2", ...] }
+## CORE PRINCIPLES
 
-Example output format: { "categories": ["Technology/Programming", "Technology/AI", "Design/Graphics", "Business/Marketing"] }`;
+1. **Categorize by TOPIC/TYPE, not format**
+   ✅ Good: Technology/Programming, Design/Graphics, Business/Marketing
+   ❌ Bad: Articles, Blogs, Videos, PDFs (these are formats, not topics)
 
-    const userPrompt = `Based on these bookmark samples, create appropriate categories:\n\n${samplesText}`;
+2. **Create broad, inclusive categories**
+   - Each category should accommodate 5-20 bookmarks
+   - Avoid overly narrow categories (e.g., "React/Tutorials/Hooks")
+   - Prefer broader themes with clear boundaries
+
+3. **Use a logical hierarchy**
+   - Maximum ${maxDepth} levels deep
+   - Group related subcategories under parent categories
+   - Example: Technology/Programming, Technology/AI, Technology/DevOps
+
+4. **Use clear, descriptive names in ${this._getLanguageName(language)}**
+   - Names should be self-explanatory
+   - Use standard terminology (e.g., "Programming" not "Code Stuff")
+
+## CLASSIFICATION STANDARDS
+
+- **Tech & Development**: Programming languages, frameworks, tools, tutorials
+- **Design**: UI, UX, graphics, typography, branding
+- **Business**: Marketing, finance, entrepreneurship, management
+- **Education**: Tutorials, courses, documentation, learning resources
+- **Entertainment**: Movies, games, music, social media
+- **News & Media**: News sites, magazines, journalism
+- **Shopping**: E-commerce, product reviews, deals
+- **Reference**: Documentation, wikis, specifications, dictionaries
+- **Tools & Utilities**: Online tools, converters, calculators
+- **Social & Community**: Forums, social networks, communities
+
+## OUTPUT FORMAT
+
+Return only JSON: { "categories": ["category/path", ...] }
+
+Example: { "categories": ["Technology/Programming", "Technology/AI", "Design/UI", "Design/UX", "Business/Marketing", "Education/Tutorials", "Entertainment/Videos"] }`;
+
+    const userPrompt = `Analyze these ${samples.length} bookmark samples and create ${maxCategories} well-structured categories:
+
+## BOOKMARK SAMPLES
+
+${samplesText}
+
+## YOUR TASK
+
+Create ${maxCategories} categories (max ${maxDepth} levels deep) that would effectively organize these bookmarks.
+
+Requirements:
+- Categories should be broad enough to group related bookmarks
+- Use ${this._getLanguageName(language)} names
+- Maximum ${maxDepth} directory levels
+- Return as JSON: { "categories": ["path1", "path2", ...] }`;
 
     return retryWithBackoff(
       () => this._createCategories(systemPrompt, userPrompt),
@@ -159,24 +203,84 @@ Example output format: { "categories": ["Technology/Programming", "Technology/AI
       throw new Error('OpenAI API key is not configured');
     }
 
-    const systemPrompt = `You are a bookmark classification assistant. Categorize the given bookmark into the most appropriate existing directory.
+    const systemPrompt = `You are an expert bookmark classification assistant. Your task is to categorize bookmarks into the most appropriate existing directory.
 
-Instructions:
-- Analyze the bookmark title, URL, and page content
-- Choose the most suitable existing directory from the provided list
-- The directory path should have at most ${maxDepth} levels
-- If no existing directory fits well, you may suggest a new path (use ${this._getLanguageName(language)} for directory names)
-- Return only JSON in the format: { "path": "directory/subdirectory", "reason": "classification reasoning" }`;
+## CLASSIFICATION PRIORITIES (in order)
 
-    const userPrompt = `Bookmark Information:
-- Title: ${title}
-- URL: ${url}
-- Page Content: ${content.substring(0, 500)}...
+1. **URL Domain & Path** (highest priority)
+   - The domain often reveals the primary topic
+   - Examples: github.com → Development, dribbble.com → Design
+   - Consider subdomains: docs.python.org → Reference, blog.example.com → Articles
 
-Existing Directories:
+2. **Page Title** (second priority)
+   - Titles usually contain key topic keywords
+   - Look for technology names, topics, or formats
+   - Examples: "React Tutorial" → Programming, "Design System" → Design
+
+3. **Page Content** (context and confirmation)
+   - Use to confirm or refine classification from URL/title
+   - Look at headings, main topics, and overall theme
+
+## DECISION GUIDELINES
+
+1. **Prefer existing categories over creating new ones**
+   - Only create new path if NO existing category fits (>= 80% mismatch)
+
+2. **Choose the most specific appropriate category**
+   - Technology/Programming over Technology (if programming-related)
+   - But don't over-specialize if content is general
+
+3. **Handle edge cases**
+   - Tutorial/documentation → Use the *topic* category (e.g., Programming Tutorial → Technology/Programming)
+   - Tools/utilities → Tools & Utilities or topic-specific category
+   - News/articles → Use the *topic* category (e.g., Tech News → Technology)
+   - Multi-topic sites → Choose the primary/dominant topic
+
+4. **Consider the website's main purpose**
+   - Developer tools → Technology/Programming or Tools & Utilities
+   - Design resources → Design/UI or Design/Graphics
+   - Learning platforms → Education/Tutorials
+
+## OUTPUT FORMAT
+
+Return only JSON: { "path": "existing/path", "reason": "brief explanation of why this category fits" }
+
+## EXAMPLES
+
+Input: github.com/facebook/react
+Output: { "path": "Technology/Programming", "reason": "GitHub repository for React, a JavaScript programming library" }
+
+Input: dribbble.com/shots/design-system
+Output: { "path": "Design/UI", "reason": "Dribbble is a design community, this is a UI design system shot" }
+
+Input: medium.com/article-about-ai
+Output: { "path": "Technology/AI", "reason": "Article about AI technology published on Medium" }`;
+
+    const userPrompt = `## BOOKMARK TO CLASSIFY
+
+**Title:** ${title}
+**URL:** ${url}
+**Content Preview:**
+${content.substring(0, 1500)}${content.length > 1500 ? '...' : ''}
+
+## AVAILABLE DIRECTORIES
+
 ${existingCategories.map((d, i) => `${i + 1}. ${d}`).join('\n')}
 
-Please classify this bookmark into the most appropriate directory.`;
+## YOUR TASK
+
+Analyze this bookmark and select the SINGLE most appropriate directory from the list above.
+
+Requirements:
+- Path must have at most ${maxDepth} levels
+- Use ${this._getLanguageName(language)} directory names if suggesting new path
+- Return JSON: { "path": "selected/path", "reason": "why this fits" }
+
+Think step-by-step:
+1. What is the main topic/domain?
+2. Which existing categories relate to this topic?
+3. Which is the BEST fit?
+4. If none fit well (>= 80% mismatch), you may suggest a new path`;
 
     return retryWithBackoff(
       () => this._classifyBookmark(systemPrompt, userPrompt),
@@ -226,7 +330,7 @@ Please classify this bookmark into the most appropriate directory.`;
       body: JSON.stringify({
         model: this.model,
         messages,
-        temperature: 0.3, // Lower temperature for more consistent results
+        temperature: 0.2, // Lower temperature for more consistent, deterministic classification
         response_format: { type: 'json_object' },
       }),
     });
