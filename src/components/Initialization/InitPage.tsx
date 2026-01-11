@@ -244,7 +244,7 @@ export const InitPage: React.FC = () => {
               onClick={handleConfirm}
               disabled={loading}
             >
-              {loading ? 'Starting...' : 'Start Classifier'}
+              {loading ? 'Starting...' : 'Start Classifying'}
             </button>
             <button className="btn btn-secondary" onClick={handleCancel}>
               Cancel
@@ -277,7 +277,7 @@ export const InitPage: React.FC = () => {
         </div>
         {!config?.isProcessing && (
           <button className="btn btn-primary btn-large" onClick={handleStart}>
-            {config?.isInitialized ? 'Re-classify' : 'Start Classifier'}
+            {config?.isInitialized ? 'Re-classify' : 'Start Classifying'}
           </button>
         )}
       </div>

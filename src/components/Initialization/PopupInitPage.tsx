@@ -103,7 +103,7 @@ export const PopupInitPage: React.FC = () => {
       <p>Organize your bookmarks automatically using AI.</p>
 
       <button className="btn btn-primary btn-block" onClick={openFullInitPage}>
-        Start Classifier
+        Start Classifying
       </button>
     </div>
   );

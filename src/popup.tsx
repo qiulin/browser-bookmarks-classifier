@@ -31,7 +31,7 @@ const PopupApp: React.FC = () => {
         <div className="menu-item" onClick={handleOpenClassifier}>
           <div className="menu-icon">🚀</div>
           <div className="menu-info">
-            <div className="menu-title">Classifier</div>
+            <div className="menu-title">Classify</div>
             <div className="menu-desc">
               {config?.isInitialized ? 'Re-classify all bookmarks' : 'Start initial classification'}
             </div>
