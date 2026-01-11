@@ -15,8 +15,8 @@ export const ConfigPage: React.FC = () => {
     llmModel: 'gpt-4o-mini',
     tavilyApiKey: '',
     jinaReaderApiKey: '',
-    metasaReaderApiKey: '',
-    scraperProvider: 'tavily' as 'tavily' | 'jina' | 'metasa',
+    metasoReaderApiKey: '',
+    scraperProvider: 'tavily' as 'tavily' | 'jina' | 'metaso',
     initSampleRate: 0.2,
     maxCategories: 10,
     excludedDirs: '',
@@ -41,7 +41,7 @@ export const ConfigPage: React.FC = () => {
         llmModel: config.llmModel,
         tavilyApiKey: config.tavilyApiKey,
         jinaReaderApiKey: config.jinaReaderApiKey || '',
-        metasaReaderApiKey: config.metasaReaderApiKey || '',
+        metasoReaderApiKey: config.metasoReaderApiKey || '',
         scraperProvider: config.scraperProvider || 'tavily',
         initSampleRate: config.initSampleRate,
         maxCategories: config.maxCategories,
@@ -89,7 +89,7 @@ export const ConfigPage: React.FC = () => {
         llmModel: localConfig.llmModel,
         tavilyApiKey: localConfig.tavilyApiKey,
         jinaReaderApiKey: localConfig.jinaReaderApiKey,
-        metasaReaderApiKey: localConfig.metasaReaderApiKey,
+        metasoReaderApiKey: localConfig.metasoReaderApiKey,
         scraperProvider: localConfig.scraperProvider,
         initSampleRate: localConfig.initSampleRate,
         maxCategories: localConfig.maxCategories,
@@ -241,13 +241,13 @@ export const ConfigPage: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="metasaReaderApiKey">Metasa AI Reader API Key</label>
+            <label htmlFor="metasoReaderApiKey">Metaso AI Reader API Key</label>
             <input
-              id="metasaReaderApiKey"
+              id="metasoReaderApiKey"
               type="password"
-              value={localConfig.metasaReaderApiKey}
-              onChange={(e) => handleChange('metasaReaderApiKey', e.target.value)}
-              placeholder="Your Metasa API Key"
+              value={localConfig.metasoReaderApiKey}
+              onChange={(e) => handleChange('metasoReaderApiKey', e.target.value)}
+              placeholder="Your Metaso API Key"
             />
           </div>
 
@@ -256,11 +256,11 @@ export const ConfigPage: React.FC = () => {
             <select
               id="scraperProvider"
               value={localConfig.scraperProvider}
-              onChange={(e) => handleChange('scraperProvider', e.target.value as 'tavily' | 'jina' | 'metasa')}
+              onChange={(e) => handleChange('scraperProvider', e.target.value as 'tavily' | 'jina' | 'metaso')}
             >
               <option value="tavily">Tavily API</option>
               <option value="jina">Jina Reader API</option>
-              <option value="metasa">Metasa AI Reader API</option>
+              <option value="metaso">Metaso AI Reader API</option>
             </select>
             <small>
               Choose the web scraper to fetch page content. Each requires its corresponding API key.

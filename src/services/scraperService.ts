@@ -1,29 +1,29 @@
 import { tavilyService } from './tavilyService';
 import { jinaReaderService } from './jinaReaderService';
-import { metasaReaderService } from './metasaReaderService';
+import { metasoReaderService } from './metasoReaderService';
 import type { PageContent } from '../types';
 
 /**
  * Scraper Service - Unified interface for web scraping
- * Automatically uses the configured scraper (Tavily, Jina Reader, or Metasa AI)
+ * Automatically uses the configured scraper (Tavily, Jina Reader, or Metaso AI)
  */
 class ScraperService {
-  private provider: 'tavily' | 'jina' | 'metasa' = 'tavily';
+  private provider: 'tavily' | 'jina' | 'metaso' = 'tavily';
 
   /**
    * Set which scraper provider to use
    */
-  setProvider(provider: 'tavily' | 'jina' | 'metasa'): void {
+  setProvider(provider: 'tavily' | 'jina' | 'metaso'): void {
     this.provider = provider;
   }
 
   /**
    * Set API keys
    */
-  setApiKeys(tavilyKey: string, jinaReaderKey: string, metasaReaderKey: string): void {
+  setApiKeys(tavilyKey: string, jinaReaderKey: string, metasoReaderKey: string): void {
     tavilyService.setApiKey(tavilyKey);
     jinaReaderService.setApiKey(jinaReaderKey);
-    metasaReaderService.setApiKey(metasaReaderKey);
+    metasoReaderService.setApiKey(metasoReaderKey);
   }
 
   /**
@@ -32,8 +32,8 @@ class ScraperService {
   async fetchPageContent(url: string): Promise<PageContent> {
     if (this.provider === 'jina') {
       return jinaReaderService.fetchPageContent(url);
-    } else if (this.provider === 'metasa') {
-      return metasaReaderService.fetchPageContent(url);
+    } else if (this.provider === 'metaso') {
+      return metasoReaderService.fetchPageContent(url);
     } else {
       return tavilyService.fetchPageContent(url);
     }
@@ -42,7 +42,7 @@ class ScraperService {
   /**
    * Get the current provider
    */
-  getProvider(): 'tavily' | 'jina' | 'metasa' {
+  getProvider(): 'tavily' | 'jina' | 'metaso' {
     return this.provider;
   }
 }

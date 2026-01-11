@@ -3,27 +3,27 @@ import { RETRY_DELAY_MS, MAX_API_RETRIES } from '../utils/constants';
 import type { PageContent } from '../types';
 
 /**
- * Metasa AI Reader Service - Fetch page content using Metasa AI Reader API
+ * Metaso AI Reader Service - Fetch page content using Metaso AI Reader API
  */
-class MetasaReaderService {
+class MetasoReaderService {
   private apiKey: string = '';
-  private baseUrl: string = 'https://r.metasa.ai/api';
+  private baseUrl: string = 'https://r.metaso.ai/api';
 
   /**
-   * Set API key for Metasa AI Reader
+   * Set API key for Metaso AI Reader
    */
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
   }
 
   /**
-   * Fetch page content using Metasa AI Reader API
+   * Fetch page content using Metaso AI Reader API
    * @param url - URL to fetch
    * @returns Page content
    */
   async fetchPageContent(url: string): Promise<PageContent> {
     if (!this.apiKey) {
-      throw new Error('Metasa AI Reader API key is not configured');
+      throw new Error('Metaso AI Reader API key is not configured');
     }
 
     // Validate URL
@@ -59,7 +59,7 @@ class MetasaReaderService {
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(
-        `Metasa AI Reader API error: ${response.status} ${response.statusText} - ${errorText}`
+        `Metaso AI Reader API error: ${response.status} ${response.statusText} - ${errorText}`
       );
     }
 
@@ -109,4 +109,4 @@ class MetasaReaderService {
 }
 
 // Export singleton instance
-export const metasaReaderService = new MetasaReaderService();
+export const metasoReaderService = new MetasoReaderService();
