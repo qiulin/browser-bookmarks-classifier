@@ -371,7 +371,7 @@ class ClassifierService {
     // Parse custom rules
     const rules = rulesService.getRules(config);
 
-    return this._classifySingleBookmark(
+    const result = await this._classifySingleBookmark(
       bookmark,
       categories,
       config.maxDirectoryDepth,
@@ -380,6 +380,11 @@ class ClassifierService {
       config.defaultLanguage,
       rules
     );
+
+    // Actually move the bookmark to the target folder
+    await bookmarkService.moveBookmark(bookmark.id!, result.folderId);
+
+    return result;
   }
 
   /**
@@ -477,26 +482,28 @@ class ClassifierService {
 
   /**
    * Extract existing category paths from bookmark tree
+   * Excludes root-level folders (Bookmarks Bar, Other Bookmarks, etc.)
    */
   private _extractExistingCategories(
     tree: chrome.bookmarks.BookmarkTreeNode[]
   ): string[] {
     const categories: string[] = [];
 
-    function traverse(node: chrome.bookmarks.BookmarkTreeNode, path: string[] = []) {
-      const currentPath = [...path, node.title];
+    function traverse(node: chrome.bookmarks.BookmarkTreeNode, path: string[] = [], isRootLevel: boolean = false) {
+      // Don't add root-level folder names to the path
+      const currentPath = isRootLevel ? path : [...path, node.title];
 
       // Only add folders that are direct children of root or at depth 2
       if (node.children && node.children.length > 0) {
         // Check if this folder has bookmarks (is a category)
         const hasBookmarks = node.children.some(child => child.url);
-        if (hasBookmarks) {
+        if (hasBookmarks && currentPath.length > 0) {
           categories.push(currentPath.join('/'));
         }
 
         // Recursively process children
         for (const child of node.children) {
-          traverse(child, currentPath);
+          traverse(child, currentPath, false);
         }
       }
     }
@@ -504,7 +511,8 @@ class ClassifierService {
     for (const root of tree) {
       if (root.children) {
         for (const child of root.children) {
-          traverse(child, []);
+          // Pass isRootLevel=true for children of root (Bookmarks Bar, Other Bookmarks, etc.)
+          traverse(child, [], true);
         }
       }
     }
