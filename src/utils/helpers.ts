@@ -132,12 +132,13 @@ export function flattenBookmarks(
 ): chrome.bookmarks.BookmarkTreeNode[] {
   const result: chrome.bookmarks.BookmarkTreeNode[] = [];
 
-  function traverse(node: chrome.bookmarks.BookmarkTreeNode, parentPath: string[] = []) {
-    const currentPath = [...parentPath, node.title];
+  function traverse(node: chrome.bookmarks.BookmarkTreeNode, isInExcluded: boolean = false) {
+    // Check if this node is an excluded folder
+    const nodeIsExcluded = !node.url && excludeFolderTitles.includes(node.title);
 
-    // Skip if in excluded folder
-    if (node.parentId && excludeFolderTitles.length > 0) {
-      // We'll handle exclusion at a higher level
+    // If parent is excluded or this node is excluded, skip traversal
+    if (isInExcluded || nodeIsExcluded) {
+      return;
     }
 
     // Only add bookmarks (not folders) to the result
@@ -147,13 +148,13 @@ export function flattenBookmarks(
 
     if (node.children) {
       for (const child of node.children) {
-        traverse(child, currentPath);
+        traverse(child, false);
       }
     }
   }
 
   for (const node of nodes) {
-    traverse(node, []);
+    traverse(node, false);
   }
 
   return result;
