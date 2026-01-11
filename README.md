@@ -98,7 +98,7 @@ Access the extension options page:
 1. Open the extension popup or options page
 2. Go to the "Full Mode" tab
 3. Optionally export your current bookmarks as backup
-4. Click "Start Full Mode"
+4. Click "Start Classifier"
 5. Wait for the process to complete (progress will be shown)
 
 The full mode process will:

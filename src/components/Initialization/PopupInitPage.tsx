@@ -89,7 +89,7 @@ export const PopupInitPage: React.FC = () => {
         <p>Your bookmarks have been organized.</p>
 
         <button className="btn btn-primary btn-block" onClick={openFullInitPage}>
-          Re-initialize
+          Re-classify
         </button>
       </div>
     );
@@ -103,7 +103,7 @@ export const PopupInitPage: React.FC = () => {
       <p>Organize your bookmarks automatically using AI.</p>
 
       <button className="btn btn-primary btn-block" onClick={openFullInitPage}>
-        Start Full Mode
+        Start Classifier
       </button>
     </div>
   );

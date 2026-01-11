@@ -6,7 +6,7 @@ import './popup.css';
 const PopupApp: React.FC = () => {
   const { config, loading } = useStorage();
 
-  const handleOpenInitialization = () => {
+  const handleOpenClassifier = () => {
     chrome.tabs.create({ url: 'options.html?tab=init' });
     window.close();
   };
@@ -28,10 +28,10 @@ const PopupApp: React.FC = () => {
       </div>
 
       <div className="popup-content">
-        <div className="menu-item" onClick={handleOpenInitialization}>
+        <div className="menu-item" onClick={handleOpenClassifier}>
           <div className="menu-icon">🚀</div>
           <div className="menu-info">
-            <div className="menu-title">Initialization</div>
+            <div className="menu-title">Classifier</div>
             <div className="menu-desc">
               {config?.isInitialized ? 'Re-classify all bookmarks' : 'Start initial classification'}
             </div>
