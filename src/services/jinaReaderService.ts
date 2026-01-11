@@ -1,4 +1,5 @@
-import { retryWithBackoff, RETRY_DELAY_MS, MAX_API_RETRIES } from '../utils/helpers';
+import { retryWithBackoff } from '../utils/helpers';
+import { RETRY_DELAY_MS, MAX_API_RETRIES } from '../utils/constants';
 import type { PageContent } from '../types';
 
 /**

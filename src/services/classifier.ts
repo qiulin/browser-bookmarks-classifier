@@ -317,7 +317,7 @@ class ClassifierService {
           if (!bookmark.url) return null;
 
           try {
-            const content = await tavilyService.fetchPageContent(bookmark.url);
+            const content = await scraperService.fetchPageContent(bookmark.url);
             return {
               title: bookmark.title,
               url: bookmark.url,
