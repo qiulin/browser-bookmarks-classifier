@@ -220,10 +220,17 @@ class BookmarkService {
    */
   async createArchive(): Promise<string> {
     const tree = await this.getTree();
-    const rootFolderId = tree[0].id;
+    // Get the first child of root (usually Bookmarks Bar)
+    // We cannot create folders directly under root
+    const rootChildren = tree[0].children || [];
+    const defaultFolderId = rootChildren[0]?.id;
+
+    if (!defaultFolderId) {
+      throw new Error('No suitable parent folder found for Archive');
+    }
 
     // Check if Archive folder already exists
-    const siblings = await this.getBookmarksInFolder(rootFolderId);
+    const siblings = await this.getBookmarksInFolder(defaultFolderId);
     const archiveFolder = siblings.find(
       (s) => isFolder(s) && s.title === ARCHIVE_FOLDER_NAME
     );
@@ -233,7 +240,7 @@ class BookmarkService {
     if (archiveFolder) {
       archiveFolderId = archiveFolder.id;
     } else {
-      const newArchive = await this.createFolder(ARCHIVE_FOLDER_NAME, rootFolderId);
+      const newArchive = await this.createFolder(ARCHIVE_FOLDER_NAME, defaultFolderId);
       archiveFolderId = newArchive.id;
     }
 
@@ -276,8 +283,16 @@ class BookmarkService {
    */
   async getDefaultFolderId(): Promise<string> {
     const tree = await this.getTree();
-    // Return the first child of root (usually Bookmarks Bar)
-    return tree[0].children?.[0]?.id || tree[0].id;
+    // Get the first child of root (usually Bookmarks Bar)
+    // Root has children like "Bookmarks Bar", "Other Bookmarks", "Mobile Bookmarks"
+    const rootChildren = tree[0].children || [];
+
+    if (rootChildren.length === 0) {
+      throw new Error('No bookmark folders found');
+    }
+
+    // Return the first folder (usually "Bookmarks Bar" or its localized name)
+    return rootChildren[0].id;
   }
 
   /**
