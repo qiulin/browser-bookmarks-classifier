@@ -21,6 +21,7 @@ export interface ExtensionConfig {
   initSampleRate: number;      // Sample rate, default 0.2 (20%)
   maxCategories: number;       // Maximum number of categories, default 10
   excludedDirs: string[];      // List of directory names to exclude
+  classificationConcurrency: number;  // Number of concurrent classifications, default 10
 
   // Directory Depth
   maxDirectoryDepth: number;   // Maximum directory depth, default 2
@@ -49,6 +50,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   initSampleRate: 0.2,
   maxCategories: 10,
   excludedDirs: [],
+  classificationConcurrency: 10,
   maxDirectoryDepth: 2,
   isInitialized: false,
   isProcessing: false,

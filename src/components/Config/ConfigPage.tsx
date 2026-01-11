@@ -20,6 +20,7 @@ export const ConfigPage: React.FC = () => {
     initSampleRate: 0.2,
     maxCategories: 10,
     excludedDirs: '',
+    classificationConcurrency: 10,
     maxDirectoryDepth: 2,
     todoFolderName: 'TODO',
     checkInterval: 60000,
@@ -46,6 +47,7 @@ export const ConfigPage: React.FC = () => {
         initSampleRate: config.initSampleRate,
         maxCategories: config.maxCategories,
         excludedDirs: excludedDirsDisplay,
+        classificationConcurrency: config.classificationConcurrency || 10,
         maxDirectoryDepth: config.maxDirectoryDepth,
         todoFolderName: config.todoFolderName,
         checkInterval: config.checkInterval,
@@ -94,6 +96,7 @@ export const ConfigPage: React.FC = () => {
         initSampleRate: localConfig.initSampleRate,
         maxCategories: localConfig.maxCategories,
         excludedDirs: excludedDirsArray,
+        classificationConcurrency: localConfig.classificationConcurrency,
         maxDirectoryDepth: localConfig.maxDirectoryDepth,
         todoFolderName: localConfig.todoFolderName,
         checkInterval: localConfig.checkInterval,
@@ -298,6 +301,19 @@ export const ConfigPage: React.FC = () => {
               value={localConfig.maxCategories}
               onChange={(e) => handleChange('maxCategories', parseInt(e.target.value))}
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="classificationConcurrency">Classification Concurrency</label>
+            <input
+              id="classificationConcurrency"
+              type="number"
+              min="1"
+              max="50"
+              value={localConfig.classificationConcurrency}
+              onChange={(e) => handleChange('classificationConcurrency', parseInt(e.target.value))}
+            />
+            <small>Number of bookmarks to classify simultaneously (default: 10)</small>
           </div>
 
           <div className="form-group">

@@ -156,47 +156,73 @@ class ClassifierService {
     let classified = 0;
     let failed = 0;
     const existingCategories = Object.keys(categoryIds);
+    const concurrency = config.classificationConcurrency || 10;
 
-    for (const bookmark of allBookmarks) {
+    // Filter bookmarks with URLs
+    const bookmarksToClassify = allBookmarks.filter(b => b.url);
+
+    // Classify with concurrency
+    for (let i = 0; i < bookmarksToClassify.length; i += concurrency) {
       if (signal.aborted) throw new Error('Aborted');
 
-      if (!bookmark.url) {
-        classified++;
-        continue;
+      const batch = bookmarksToClassify.slice(i, i + concurrency);
+
+      const results = await Promise.allSettled(
+        batch.map(async (bookmark) => {
+          try {
+            const result = await this._classifySingleBookmark(
+              bookmark,
+              existingCategories,
+              config.maxDirectoryDepth,
+              rootFolderId,
+              signal,
+              config.defaultLanguage
+            );
+
+            // Move to classified folder
+            await bookmarkService.moveBookmark(bookmark.id!, result.folderId);
+
+            return { success: true, bookmark };
+          } catch (error) {
+            console.error(`Failed to classify bookmark ${bookmark.title}:`, error);
+            // Move to Failures folder
+            try {
+              await bookmarkService.moveBookmark(bookmark.id!, failuresFolderId);
+            } catch (moveError) {
+              console.error(`Failed to move bookmark to Failures folder:`, moveError);
+            }
+            return { success: false, bookmark };
+          }
+        })
+      );
+
+      // Update counters and progress
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          classified++;
+          if (!result.value.success) {
+            failed++;
+          }
+        } else {
+          classified++;
+          failed++;
+        }
       }
 
-      try {
-        const result = await this._classifySingleBookmark(
-          bookmark,
-          existingCategories,
-          config.maxDirectoryDepth,
-          rootFolderId,
-          signal,
-          config.defaultLanguage
-        );
-
-        // Move to classified folder
-        await bookmarkService.moveBookmark(bookmark.id!, result.folderId);
-
-        classified++;
+      // Report progress for last item in batch
+      if (batch.length > 0) {
         progressCallback?.({
           current: classified,
           total,
-          message: `Classified: ${bookmark.title}`,
+          message: `Classified: ${batch[batch.length - 1].title}`,
           stage: 'classifying',
         });
-      } catch (error) {
-        console.error(`Failed to classify bookmark ${bookmark.title}:`, error);
-        // Move to Failures folder
-        try {
-          await bookmarkService.moveBookmark(bookmark.id!, failuresFolderId);
-          failed++;
-        } catch (moveError) {
-          console.error(`Failed to move bookmark to Failures folder:`, moveError);
-        }
-        classified++;
       }
     }
+
+    // Count bookmarks without URLs as classified
+    const bookmarksWithoutUrl = allBookmarks.length - bookmarksToClassify.length;
+    classified += bookmarksWithoutUrl;
 
     // Complete
     const successMessage = failed > 0
