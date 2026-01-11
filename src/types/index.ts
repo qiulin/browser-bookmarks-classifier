@@ -20,8 +20,9 @@ export interface ExtensionConfig {
   isInitialized: boolean;      // Whether initialization is complete
   isProcessing: boolean;       // Whether processing is in progress
 
-  // TODO Folder Name
+  // TODO Folder Configuration
   todoFolderName: string;      // Default "TODO"
+  checkInterval: number;       // Check interval in ms, default 60000 (1 minute)
 }
 
 // Default configuration
@@ -37,6 +38,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   isInitialized: false,
   isProcessing: false,
   todoFolderName: 'TODO',
+  checkInterval: 60000, // 1 minute in milliseconds
 };
 
 // Bookmark types

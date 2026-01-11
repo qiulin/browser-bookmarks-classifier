@@ -49,6 +49,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   isInitialized: false,
   isProcessing: false,
   todoFolderName: DEFAULT_TODO_FOLDER_NAME,
+  checkInterval: 60000, // 1 minute in milliseconds
 };
 
 // System prompts for LLM

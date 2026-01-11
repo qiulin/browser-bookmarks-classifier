@@ -19,6 +19,7 @@ export const ConfigPage: React.FC = () => {
     excludedDirs: '',
     maxDirectoryDepth: 2,
     todoFolderName: 'TODO',
+    checkInterval: 60000,
   });
 
   // Update local config when global config loads
@@ -36,6 +37,7 @@ export const ConfigPage: React.FC = () => {
         excludedDirs: config.excludedDirs.join(', '),
         maxDirectoryDepth: config.maxDirectoryDepth,
         todoFolderName: config.todoFolderName,
+        checkInterval: config.checkInterval,
       });
     }
   }, [config]);
@@ -71,6 +73,7 @@ export const ConfigPage: React.FC = () => {
         excludedDirs: excludedDirsArray,
         maxDirectoryDepth: localConfig.maxDirectoryDepth,
         todoFolderName: localConfig.todoFolderName,
+        checkInterval: localConfig.checkInterval,
       });
 
       setMessage({ type: 'success', text: 'Configuration saved successfully!' });
@@ -275,6 +278,24 @@ export const ConfigPage: React.FC = () => {
               placeholder="TODO"
             />
             <small>Bookmarks in this folder will be automatically classified</small>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="checkInterval">
+              Check Interval: {Math.round(localConfig.checkInterval / 1000)} seconds
+            </label>
+            <input
+              id="checkInterval"
+              type="range"
+              min="10000"
+              max="300000"
+              step="10000"
+              value={localConfig.checkInterval}
+              onChange={(e) => handleChange('checkInterval', parseInt(e.target.value))}
+            />
+            <small>
+              How often to check the TODO folder for new bookmarks (10s - 5min)
+            </small>
           </div>
         </section>
 
