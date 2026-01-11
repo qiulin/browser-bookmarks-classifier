@@ -34,7 +34,7 @@ const OptionsApp: React.FC = () => {
           className={`nav-button ${activeTab === 'init' ? 'active' : ''}`}
           onClick={() => setActiveTab('init')}
         >
-          Initialization
+          Full Mode
         </button>
       </nav>
 

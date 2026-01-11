@@ -4,7 +4,7 @@ A Chrome/Edge browser extension that automatically classifies bookmarks using LL
 
 ## Features
 
-- **Initialization Mode**: Re-classify all existing bookmarks
+- **Full Mode**: Re-classify all existing bookmarks
   - Creates backup archive of original bookmarks
   - Samples and analyzes bookmark content
   - Generates category structure using AI
@@ -82,7 +82,7 @@ Access the extension options page:
 **Settings include:**
 - LLM model selection (default: GPT-4o Mini)
 - Scraper provider selection
-- Sample rate for initialization (default: 20%)
+- Sample rate for full mode (default: 20%)
 - Maximum categories (default: 10)
 - Directory depth (default: 2 levels)
 - Classification concurrency (default: 10)
@@ -93,15 +93,15 @@ Access the extension options page:
 
 ## Usage
 
-### Initialization Mode
+### Full Mode
 
 1. Open the extension popup or options page
-2. Go to the "Initialization" tab
+2. Go to the "Full Mode" tab
 3. Optionally export your current bookmarks as backup
-4. Click "Start Initialization"
+4. Click "Start Full Mode"
 5. Wait for the process to complete (progress will be shown)
 
-The initialization process will:
+The full mode process will:
 - Create an "Archive" folder with all original bookmarks
 - Sample a percentage of bookmarks for category creation
 - Generate or use predefined categories
@@ -110,7 +110,7 @@ The initialization process will:
 
 ### Incremental Mode
 
-After initialization:
+After full mode completes:
 1. Simply add new bookmarks to the "TODO" folder
 2. The extension will automatically check and classify them
 3. Classified bookmarks will be moved to appropriate categories
@@ -199,7 +199,7 @@ chrome-bookmarks-classifier/
 ## Troubleshooting
 
 - **Bookmarks not being classified**: Check that API keys are correctly configured
-- **"TODO folder not found"**: Run initialization first to create the TODO folder
+- **"TODO folder not found"**: Run full mode first to create the TODO folder
 - **Service worker suspended**: The extension uses a heartbeat to stay active
 - **Failed classifications**: Check the "Failures" folder for problematic bookmarks
 

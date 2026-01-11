@@ -37,7 +37,7 @@ Vite copies `public/manifest.json` to `dist/` after build.
 All services in `src/services/` are exported as singletons:
 
 - **classifierService** (`classifier.ts`) - Core classification logic
-  - Manages initialization mode (batch re-classification)
+  - Manages full mode (batch re-classification)
   - Handles abort/cancellation via AbortController
   - Implements concurrency control for batch processing
   - Creates category folders and moves bookmarks
@@ -73,11 +73,11 @@ All services in `src/services/` are exported as singletons:
 3. Monitors TODO folder at configurable intervals (default 1 minute)
 4. Maintains heartbeat (every 20s) to prevent service worker suspension
 
-**Message types**: `GET_CONFIG`, `SET_CONFIG`, `START_INITIALIZATION`, `STOP_INITIALIZATION`, `GET_PROGRESS`, `CLASSIFY_BOOKMARK`, `EXPORT_BOOKMARKS`
+**Message types**: `GET_CONFIG`, `SET_CONFIG`, `START_FULL_MODE`, `STOP_FULL_MODE`, `GET_PROGRESS`, `CLASSIFY_BOOKMARK`, `EXPORT_BOOKMARKS`
 
 ### Operational Modes
 
-**Initialization Mode** (via `START_INITIALIZATION`):
+**Full Mode** (via `START_FULL_MODE`):
 1. Create Archive folder with original bookmarks
 2. Sample configurable percentage (default 20%) of bookmarks
 3. Fetch content for samples via scraper API
@@ -92,10 +92,10 @@ All services in `src/services/` are exported as singletons:
 
 ### React UI Structure
 
-- **popup.tsx** - Quick access to initialization and configuration
-- **options.tsx** - Tabbed container (Configuration + Initialization tabs)
+- **popup.tsx** - Quick access to full mode and configuration
+- **options.tsx** - Tabbed container (Configuration + Full Mode tabs)
 - **components/Config/ConfigPage.tsx** - Full configuration form
-- **components/Initialization/InitPage.tsx** - Multi-stage initialization UI with progress tracking
+- **components/Initialization/InitPage.tsx** - Multi-stage full mode UI with progress tracking
 - **hooks/useStorage.ts** - React hook for Chrome Storage state synchronization
 
 ### Configuration Schema
@@ -116,7 +116,7 @@ interface ExtensionConfig {
   metasoReaderApiKey: string;
 
   // Classification Settings
-  initSampleRate: number;          // default 0.2 (20%)
+  fullModeSampleRate: number;      // default 0.2 (20%)
   maxCategories: number;           // default 10
   maxDirectoryDepth: number;       // default 2
   classificationConcurrency: number; // default 10
@@ -139,7 +139,7 @@ interface ExtensionConfig {
 
 ### Special Folder Names
 
-- **Archive** - Original bookmark backup (created during initialization)
+- **Archive** - Original bookmark backup (created during full mode)
 - **Failures** - Bookmarks that failed classification
 - **TODO** - Folder monitored for incremental classification
 

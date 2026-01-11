@@ -52,7 +52,7 @@ export const PopupInitPage: React.FC = () => {
       <div className="popup-init-page processing">
         <div className="processing-header">
           <div className="status-icon">⟳</div>
-          <h3>Initializing...</h3>
+          <h3>Running Full Mode...</h3>
         </div>
 
         <div className="progress-summary">
@@ -103,7 +103,7 @@ export const PopupInitPage: React.FC = () => {
       <p>Organize your bookmarks automatically using AI.</p>
 
       <button className="btn btn-primary btn-block" onClick={openFullInitPage}>
-        Start Initialization
+        Start Full Mode
       </button>
     </div>
   );

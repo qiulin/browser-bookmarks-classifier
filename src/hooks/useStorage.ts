@@ -114,12 +114,12 @@ export function useMessageHandler() {
     }
   }
 
-  async function startInitialization() {
-    return sendMessage('START_INITIALIZATION');
+  async function startFullMode() {
+    return sendMessage('START_FULL_MODE');
   }
 
-  async function stopInitialization() {
-    return sendMessage('STOP_INITIALIZATION');
+  async function stopFullMode() {
+    return sendMessage('STOP_FULL_MODE');
   }
 
   async function getProgress() {
@@ -134,8 +134,8 @@ export function useMessageHandler() {
     loading,
     error,
     sendMessage,
-    startInitialization,
-    stopInitialization,
+    startFullMode,
+    stopFullMode,
     getProgress,
     exportBookmarks,
   };

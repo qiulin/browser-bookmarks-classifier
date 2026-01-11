@@ -20,10 +20,10 @@ class ClassifierService {
   private isProcessing: boolean = false;
 
   /**
-   * Run the initialization mode
+   * Run the full mode
    * @param progressCallback - Callback for progress updates
    */
-  async runInitialization(progressCallback?: ProgressCallback): Promise<void> {
+  async runFullMode(progressCallback?: ProgressCallback): Promise<void> {
     if (this.isProcessing) {
       throw new Error('Classification is already in progress');
     }
@@ -41,14 +41,14 @@ class ClassifierService {
       openaiService.setApiKey(config.openaiApiKey);
       openaiService.setModel(config.llmModel);
 
-      await this._runInitialization(config, progressCallback);
+      await this._runFullMode(config, progressCallback);
     } catch (error) {
       // Handle abort as normal cancellation, not an error
       if (error instanceof Error && error.message === 'Aborted') {
         progressCallback?.({
           current: 0,
           total: 0,
-          message: 'Initialization cancelled by user',
+          message: 'Full mode cancelled by user',
           stage: 'complete',
         });
         return;
@@ -62,9 +62,9 @@ class ClassifierService {
   }
 
   /**
-   * Internal initialization logic
+   * Internal full mode logic
    */
-  private async _runInitialization(
+  private async _runFullMode(
     config: ExtensionConfig,
     progressCallback?: ProgressCallback
   ): Promise<void> {
@@ -100,7 +100,7 @@ class ClassifierService {
       stage: 'sampling',
     });
 
-    const sampledBookmarks = sampleArray(allBookmarks, config.initSampleRate);
+    const sampledBookmarks = sampleArray(allBookmarks, config.fullModeSampleRate);
 
     // Stage 4: Fetch content for samples
     if (signal.aborted) throw new Error('Aborted');

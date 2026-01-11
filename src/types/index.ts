@@ -17,8 +17,8 @@ export interface ExtensionConfig {
   // Scraper Provider Selection
   scraperProvider: 'tavily' | 'jina' | 'metaso';  // Which scraper to use
 
-  // Initialization Configuration
-  initSampleRate: number;      // Sample rate, default 0.2 (20%)
+  // Full Mode Configuration
+  fullModeSampleRate: number;      // Sample rate, default 0.2 (20%)
   maxCategories: number;       // Maximum number of categories, default 10
   excludedDirs: string[];      // List of directory names to exclude
   classificationConcurrency: number;  // Number of concurrent classifications, default 10
@@ -49,7 +49,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   jinaReaderApiKey: '',
   metasoReaderApiKey: '',
   scraperProvider: 'tavily',
-  initSampleRate: 0.2,
+  fullModeSampleRate: 0.2,
   maxCategories: 10,
   excludedDirs: [],
   classificationConcurrency: 10,
@@ -108,8 +108,8 @@ export interface ProgressUpdate {
 export type MessageType =
   | 'GET_CONFIG'
   | 'SET_CONFIG'
-  | 'START_INITIALIZATION'
-  | 'STOP_INITIALIZATION'
+  | 'START_FULL_MODE'
+  | 'STOP_FULL_MODE'
   | 'GET_PROGRESS'
   | 'CLASSIFY_BOOKMARK'
   | 'EXPORT_BOOKMARKS';

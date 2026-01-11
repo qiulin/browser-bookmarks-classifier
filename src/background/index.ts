@@ -5,7 +5,7 @@ import type { Message, ProgressUpdate } from '../types';
 
 /**
  * Background Service Worker
- * Handles initialization mode and incremental mode
+ * Handles full mode and incremental mode
  */
 
 // Track processed bookmark IDs to avoid re-processing
@@ -71,11 +71,11 @@ async function handleMessage(message: Message): Promise<any> {
       startTodoCheck(newConfig);
       return newConfig;
 
-    case 'START_INITIALIZATION':
-      return startInitialization();
+    case 'START_FULL_MODE':
+      return startFullMode();
 
-    case 'STOP_INITIALIZATION':
-      return stopInitialization();
+    case 'STOP_FULL_MODE':
+      return stopFullMode();
 
     case 'GET_PROGRESS':
       return storageService.getProgress();
@@ -92,13 +92,24 @@ async function handleMessage(message: Message): Promise<any> {
 }
 
 /**
- * Start initialization mode
+ * Start full mode
  */
-async function startInitialization(): Promise<void> {
+async function startFullMode(): Promise<void> {
   const config = await storageService.getConfig();
 
-  if (!config.openaiApiKey || !config.tavilyApiKey) {
-    throw new Error('API keys are not configured');
+  // Check OpenAI API key (always required)
+  if (!config.openaiApiKey) {
+    throw new Error('OpenAI API key is not configured');
+  }
+
+  // Check scraper provider API key based on selection
+  const scraperProvider = config.scraperProvider || 'tavily';
+  if (scraperProvider === 'tavily' && !config.tavilyApiKey) {
+    throw new Error('Tavily API key is not configured');
+  } else if (scraperProvider === 'jina' && !config.jinaReaderApiKey) {
+    throw new Error('Jina Reader API key is not configured');
+  } else if (scraperProvider === 'metaso' && !config.metasoReaderApiKey) {
+    throw new Error('Metaso AI Reader API key is not configured');
   }
 
   if (config.isProcessing) {
@@ -107,8 +118,8 @@ async function startInitialization(): Promise<void> {
 
   await storageService.setConfig({ isProcessing: true });
 
-  // Run initialization with progress callback
-  classifierService.runInitialization(async (progress: ProgressUpdate) => {
+  // Run full mode with progress callback
+  classifierService.runFullMode(async (progress: ProgressUpdate) => {
     await storageService.setProgress(progress);
 
     // Notify all listeners (popup, options pages)
@@ -119,27 +130,27 @@ async function startInitialization(): Promise<void> {
       // Ignore errors if no listeners
     });
 
-    // Start TODO checking after initialization completes
+    // Start TODO checking after full mode completes
     if (progress.stage === 'complete') {
       const updatedConfig = await storageService.getConfig();
       startTodoCheck(updatedConfig);
     }
   }).catch(error => {
-    console.error('Initialization failed:', error);
+    console.error('Full mode failed:', error);
     throw error;
   });
 }
 
 /**
- * Stop initialization mode
+ * Stop full mode
  */
-async function stopInitialization(): Promise<void> {
+async function stopFullMode(): Promise<void> {
   classifierService.abort();
   await storageService.setConfig({ isProcessing: false });
   await storageService.setProgress({
     current: 0,
     total: 0,
-    message: 'Initialization stopped by user',
+    message: 'Full mode stopped by user',
     stage: 'idle',
   });
 }

@@ -7,7 +7,7 @@ type Stage = 'idle' | 'confirm' | 'processing' | 'complete' | 'error';
 
 export const InitPage: React.FC = () => {
   const { config, progress } = useStorage();
-  const { startInitialization, stopInitialization, loading } = useMessageHandler();
+  const { startFullMode, stopFullMode, loading } = useMessageHandler();
   const [stage, setStage] = useState<Stage>('idle');
   const [exporting, setExporting] = useState(false);
   const [stopping, setStopping] = useState(false);
@@ -36,10 +36,10 @@ export const InitPage: React.FC = () => {
   const handleConfirm = async () => {
     setError(null);
     try {
-      await startInitialization();
+      await startFullMode();
       setStage('processing');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start initialization');
+      setError(err instanceof Error ? err.message : 'Failed to start full mode');
       setStage('error');
     }
   };
@@ -62,10 +62,10 @@ export const InitPage: React.FC = () => {
   const handleStop = async () => {
     setStopping(true);
     try {
-      await stopInitialization();
+      await stopFullMode();
       setStage('idle');
     } catch (err) {
-      console.error('Failed to stop initialization:', err);
+      console.error('Failed to stop full mode:', err);
     } finally {
       setStopping(false);
     }
@@ -126,7 +126,7 @@ export const InitPage: React.FC = () => {
             {stage === 'complete' ? '✓' : '⏳'}
           </div>
           <h2>
-            {stage === 'complete' ? 'Initialization Complete!' : 'Initializing...'}
+            {stage === 'complete' ? 'Full Mode Complete!' : 'Running Full Mode...'}
           </h2>
 
           {/* Overall progress bar */}
@@ -183,7 +183,7 @@ export const InitPage: React.FC = () => {
               onClick={handleStop}
               disabled={stopping}
             >
-              {stopping ? 'Stopping...' : 'Stop Initialization'}
+              {stopping ? 'Stopping...' : 'Stop Full Mode'}
             </button>
           )}
         </div>
@@ -196,7 +196,7 @@ export const InitPage: React.FC = () => {
       <div className="init-page error">
         <div className="error-content">
           <div className="error-icon">⚠️</div>
-          <h2>Initialization Failed</h2>
+          <h2>Full Mode Failed</h2>
           {error && <p className="error-message">{error}</p>}
           <div className="error-actions">
             <button className="btn btn-primary" onClick={handleConfirm}>
@@ -215,7 +215,7 @@ export const InitPage: React.FC = () => {
     return (
       <div className="init-page confirm">
         <div className="confirm-content">
-          <h2>Confirm Initialization</h2>
+          <h2>Confirm Full Mode</h2>
           <p className="confirm-warning">
             ⚠️ This will reorganize all your bookmarks into new categories.
           </p>
@@ -244,7 +244,7 @@ export const InitPage: React.FC = () => {
               onClick={handleConfirm}
               disabled={loading}
             >
-              {loading ? 'Starting...' : 'Start Initialization'}
+              {loading ? 'Starting...' : 'Start Full Mode'}
             </button>
             <button className="btn btn-secondary" onClick={handleCancel}>
               Cancel
@@ -271,13 +271,13 @@ export const InitPage: React.FC = () => {
           </div>
           {config?.isInitialized && (
             <p className="reinit-note">
-              Your bookmarks have already been classified. Run initialization again to re-classify all bookmarks.
+              Your bookmarks have already been classified. Run full mode again to re-classify all bookmarks.
             </p>
           )}
         </div>
         {!config?.isProcessing && (
           <button className="btn btn-primary btn-large" onClick={handleStart}>
-            {config?.isInitialized ? 'Re-initialize' : 'Start Initialization'}
+            {config?.isInitialized ? 'Re-run Full Mode' : 'Start Full Mode'}
           </button>
         )}
       </div>

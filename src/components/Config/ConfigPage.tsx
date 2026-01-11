@@ -17,7 +17,7 @@ export const ConfigPage: React.FC = () => {
     jinaReaderApiKey: '',
     metasoReaderApiKey: '',
     scraperProvider: 'tavily' as 'tavily' | 'jina' | 'metaso',
-    initSampleRate: 0.2,
+    fullModeSampleRate: 0.2,
     maxCategories: 10,
     excludedDirs: '',
     classificationConcurrency: 10,
@@ -46,7 +46,7 @@ export const ConfigPage: React.FC = () => {
         jinaReaderApiKey: config.jinaReaderApiKey || '',
         metasoReaderApiKey: config.metasoReaderApiKey || '',
         scraperProvider: config.scraperProvider || 'tavily',
-        initSampleRate: config.initSampleRate,
+        fullModeSampleRate: config.fullModeSampleRate,
         maxCategories: config.maxCategories,
         excludedDirs: excludedDirsDisplay,
         classificationConcurrency: config.classificationConcurrency || 10,
@@ -97,7 +97,7 @@ export const ConfigPage: React.FC = () => {
         jinaReaderApiKey: localConfig.jinaReaderApiKey,
         metasoReaderApiKey: localConfig.metasoReaderApiKey,
         scraperProvider: localConfig.scraperProvider,
-        initSampleRate: localConfig.initSampleRate,
+        fullModeSampleRate: localConfig.fullModeSampleRate,
         maxCategories: localConfig.maxCategories,
         excludedDirs: excludedDirsArray,
         classificationConcurrency: localConfig.classificationConcurrency,
@@ -277,22 +277,22 @@ export const ConfigPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Initialization Configuration */}
+        {/* Full Mode Configuration */}
         <section className="config-section">
-          <h2>Initialization Settings</h2>
+          <h2>Full Mode Settings</h2>
 
           <div className="form-group">
-            <label htmlFor="initSampleRate">
-              Sample Rate: {Math.round(localConfig.initSampleRate * 100)}%
+            <label htmlFor="fullModeSampleRate">
+              Sample Rate: {Math.round(localConfig.fullModeSampleRate * 100)}%
             </label>
             <input
-              id="initSampleRate"
+              id="fullModeSampleRate"
               type="range"
               min="0.1"
               max="1"
               step="0.1"
-              value={localConfig.initSampleRate}
-              onChange={(e) => handleChange('initSampleRate', parseFloat(e.target.value))}
+              value={localConfig.fullModeSampleRate}
+              onChange={(e) => handleChange('fullModeSampleRate', parseFloat(e.target.value))}
             />
             <small>Percentage of bookmarks to sample for category creation</small>
           </div>
