@@ -167,9 +167,24 @@ class ClassifierService {
 
       const batch = bookmarksToClassify.slice(i, i + concurrency);
 
-      const results = await Promise.allSettled(
+      // Create a promise that rejects when aborted
+      const abortPromise = new Promise<never>((_, reject) => {
+        if (signal.aborted) {
+          reject(new Error('Aborted'));
+        } else {
+          signal.addEventListener('abort', () => {
+            reject(new Error('Aborted'));
+          });
+        }
+      });
+
+      // Process batch with abort capability
+      const batchPromise = Promise.allSettled(
         batch.map(async (bookmark) => {
           try {
+            // Check abort before processing
+            if (signal.aborted) throw new Error('Aborted');
+
             const result = await this._classifySingleBookmark(
               bookmark,
               existingCategories,
@@ -179,12 +194,23 @@ class ClassifierService {
               config.defaultLanguage
             );
 
+            // Check abort before moving
+            if (signal.aborted) throw new Error('Aborted');
+
             // Move to classified folder
             await bookmarkService.moveBookmark(bookmark.id!, result.folderId);
 
             return { success: true, bookmark };
           } catch (error) {
+            // Check if this is an abort error
+            if (error instanceof Error && error.message === 'Aborted') {
+              throw error; // Re-throw abort errors
+            }
             console.error(`Failed to classify bookmark ${bookmark.title}:`, error);
+
+            // Check abort before moving to failures
+            if (signal.aborted) throw new Error('Aborted');
+
             // Move to Failures folder
             try {
               await bookmarkService.moveBookmark(bookmark.id!, failuresFolderId);
@@ -195,6 +221,14 @@ class ClassifierService {
           }
         })
       );
+
+      // Race between batch processing and abort - abort wins
+      const results = await Promise.race([
+        batchPromise,
+        abortPromise.then(() => {
+          throw new Error('Aborted');
+        })
+      ]) as PromiseSettledResult<{ success: boolean; bookmark: chrome.bookmarks.BookmarkTreeNode }>[];
 
       // Update counters and progress
       for (const result of results) {
@@ -315,6 +349,9 @@ class ClassifierService {
     signal?: AbortSignal,
     language: string = 'en'
   ): Promise<{ path: string; folderId: string }> {
+    // Check abort before starting
+    if (signal?.aborted) throw new Error('Aborted');
+
     // Fetch page content
     const content = await scraperService.fetchPageContent(bookmark.url!);
 
@@ -329,6 +366,8 @@ class ClassifierService {
       maxDepth,
       language
     );
+
+    if (signal?.aborted) throw new Error('Aborted');
 
     // Get or create target folder
     const folderId = await bookmarkService.getOrCreateFolder(result.path, rootFolderId);
