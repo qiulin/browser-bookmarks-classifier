@@ -5,6 +5,17 @@
   padding: 0.5rem 0;
 }
 
+/* Loading State */
+.popup-init-page.loading {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.loading-icon {
+  font-size: 2.5rem;
+  animation: spin 2s linear infinite;
+}
+
 /* Common Styles */
 .popup-init-page h3 {
   margin: 0;

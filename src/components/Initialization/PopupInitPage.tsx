@@ -3,7 +3,7 @@ import { useStorage } from '../../hooks/useStorage';
 import './PopupInitPage.css';
 
 export const PopupInitPage: React.FC = () => {
-  const { config, progress } = useStorage();
+  const { config, progress, loading } = useStorage();
 
   const getProgressPercentage = () => {
     if (!progress || progress.total === 0) return 0;
@@ -34,8 +34,18 @@ export const PopupInitPage: React.FC = () => {
     window.close();
   };
 
+  // Loading state
+  if (loading || !config) {
+    return (
+      <div className="popup-init-page loading">
+        <div className="loading-icon">⟳</div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   // Processing state
-  if (config?.isProcessing) {
+  if (config.isProcessing) {
     const progressPercent = getProgressPercentage();
 
     return (
@@ -71,7 +81,7 @@ export const PopupInitPage: React.FC = () => {
   }
 
   // Completed state
-  if (config?.isInitialized) {
+  if (config.isInitialized) {
     return (
       <div className="popup-init-page initialized">
         <div className="success-icon">✓</div>
