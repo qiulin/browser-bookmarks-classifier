@@ -244,10 +244,33 @@ class BookmarkService {
       backupFolderId = newBackup.id;
     }
 
-    // Backup all folders (except Backup itself)
+    // Backup all items (folders and bookmarks, except Backup itself)
     for (const sibling of siblings) {
-      if (isFolder(sibling) && sibling.title !== BACKUP_FOLDER_NAME) {
+      if (sibling.title === BACKUP_FOLDER_NAME) {
+        continue; // Skip Backup folder itself
+      }
+
+      if (isFolder(sibling)) {
+        // Copy entire folder tree
         await this.copyBookmarkTree(sibling.id, backupFolderId);
+      } else if (sibling.url) {
+        // Copy individual bookmark
+        await new Promise<void>((resolve, reject) => {
+          chrome.bookmarks.create(
+            {
+              title: sibling.title,
+              url: sibling.url,
+              parentId: backupFolderId,
+            },
+            () => {
+              if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+              } else {
+                resolve();
+              }
+            }
+          );
+        });
       }
     }
 
