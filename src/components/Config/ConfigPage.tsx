@@ -22,6 +22,7 @@ export const ConfigPage: React.FC = () => {
     excludedDirs: '',
     classificationConcurrency: 10,
     customRules: '',
+    predefinedCategories: '',
     maxDirectoryDepth: 2,
     todoFolderName: 'TODO',
     checkInterval: 60000,
@@ -50,6 +51,7 @@ export const ConfigPage: React.FC = () => {
         excludedDirs: excludedDirsDisplay,
         classificationConcurrency: config.classificationConcurrency || 10,
         customRules: config.customRules || '',
+        predefinedCategories: config.predefinedCategories || '',
         maxDirectoryDepth: config.maxDirectoryDepth,
         todoFolderName: config.todoFolderName,
         checkInterval: config.checkInterval,
@@ -100,6 +102,7 @@ export const ConfigPage: React.FC = () => {
         excludedDirs: excludedDirsArray,
         classificationConcurrency: localConfig.classificationConcurrency,
         customRules: localConfig.customRules,
+        predefinedCategories: localConfig.predefinedCategories,
         maxDirectoryDepth: localConfig.maxDirectoryDepth,
         todoFolderName: localConfig.todoFolderName,
         checkInterval: localConfig.checkInterval,
@@ -340,6 +343,30 @@ export const ConfigPage: React.FC = () => {
               <br />- 如果是 URL包含/标题包含/域名/路径/内容包含，则分类为 [category]
               <br />- If URL contains/title contains/domain/path/content contains, classify as [category]
               <br />- 如果是首页，则分类为 [category] (If homepage, classify as)
+            </small>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="predefinedCategories">Predefined Categories</label>
+            <textarea
+              id="predefinedCategories"
+              rows={8}
+              value={localConfig.predefinedCategories}
+              onChange={(e) => handleChange('predefinedCategories', e.target.value)}
+              placeholder={`Examples:
+Tech/Programming
+Tech/Frontend
+Tech/Backend
+Design/UI
+Design/UX
+Marketing
+Business
+Education
+Entertainment`}
+              className="rules-textarea"
+            />
+            <small>
+              Predefined category paths (one per line). If provided, these categories will be used instead of AI-generated categories during initialization. Supports multi-level paths separated by "/". Empty = use AI to generate categories.
             </small>
           </div>
 

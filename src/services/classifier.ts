@@ -125,22 +125,45 @@ class ClassifierService {
       stage: 'categorizing',
     });
 
-    const validSampleData = sampleData.filter(d => d !== null) as Array<{
-      title: string;
-      url: string;
-      content: string;
-    }>;
+    let categories: string[] = [];
 
-    if (validSampleData.length === 0) {
-      throw new Error('Failed to fetch content for sample bookmarks');
+    // Check if predefined categories are provided
+    if (config.predefinedCategories && config.predefinedCategories.trim().length > 0) {
+      // Parse predefined categories (one per line)
+      categories = config.predefinedCategories
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+
+      if (categories.length === 0) {
+        throw new Error('No valid predefined categories found');
+      }
+
+      progressCallback?.({
+        current: sampledBookmarks.length,
+        total,
+        message: `Using ${categories.length} predefined categories...`,
+        stage: 'categorizing',
+      });
+    } else {
+      // Use AI to generate categories
+      const validSampleData = sampleData.filter(d => d !== null) as Array<{
+        title: string;
+        url: string;
+        content: string;
+      }>;
+
+      if (validSampleData.length === 0) {
+        throw new Error('Failed to fetch content for sample bookmarks');
+      }
+
+      categories = await openaiService.createCategories(
+        validSampleData,
+        config.maxCategories,
+        config.maxDirectoryDepth,
+        config.defaultLanguage
+      );
     }
-
-    const categories = await openaiService.createCategories(
-      validSampleData,
-      config.maxCategories,
-      config.maxDirectoryDepth,
-      config.defaultLanguage
-    );
 
     // Create category folders
     const rootFolderId = await bookmarkService.getDefaultFolderId();
