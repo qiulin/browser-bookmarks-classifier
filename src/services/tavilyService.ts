@@ -1,5 +1,5 @@
 import { TAVILY_API_ENDPOINT, MAX_API_RETRIES, RETRY_DELAY_MS } from '../utils/constants';
-import { retryWithBackoff, sleep } from '../utils/helpers';
+import { sleep } from '../utils/helpers';
 import type { PageContent } from '../types';
 
 /**
@@ -40,11 +40,33 @@ class TavilyService {
       throw new Error('Tavily API key is not configured');
     }
 
-    return retryWithBackoff(
-      () => this._fetchPageContent(url),
-      MAX_API_RETRIES,
-      RETRY_DELAY_MS
-    );
+    // Custom retry logic with non-retriable error detection
+    let lastError: Error | undefined;
+
+    for (let attempt = 0; attempt < MAX_API_RETRIES; attempt++) {
+      try {
+        return await this._fetchPageContent(url);
+      } catch (error) {
+        lastError = error as Error;
+
+        // Check if this is a non-retriable error
+        if (this.isNonRetriableError(error)) {
+          console.error(`Non-retriable error for URL ${url}:`, lastError.message);
+          throw error; // Don't retry
+        }
+
+        // If this is the last attempt, throw the error
+        if (attempt >= MAX_API_RETRIES - 1) {
+          throw error;
+        }
+
+        // Wait before retrying
+        const delay = RETRY_DELAY_MS * Math.pow(2, attempt);
+        await sleep(delay);
+      }
+    }
+
+    throw lastError;
   }
 
   /**
@@ -96,6 +118,23 @@ class TavilyService {
   }
 
   /**
+   * Check if an error should not be retried (permanent failures)
+   */
+  private isNonRetriableError(error: any): boolean {
+    const errorMessage = error?.message || String(error);
+
+    // Don't retry for these specific errors
+    const nonRetriablePatterns = [
+      'Query is too long',
+      'Invalid URL',
+      'Unsupported URL',
+      '400', // Bad Request
+    ];
+
+    return nonRetriablePatterns.some(pattern => errorMessage.includes(pattern));
+  }
+
+  /**
    * Fetch multiple page contents in batch
    * @param urls - Array of URLs to fetch
    * @param batchSize - Number of concurrent requests
@@ -113,11 +152,20 @@ class TavilyService {
         batch.map(url => this.fetchPageContent(url))
       );
 
-      for (const result of batchResults) {
+      for (let j = 0; j < batchResults.length; j++) {
+        const result = batchResults[j];
+        const url = batch[j];
         if (result.status === 'fulfilled') {
           results.push(result.value);
         } else {
-          console.error('Failed to fetch page content:', result.reason);
+          const errorReason = result.reason;
+          console.error(`Failed to fetch content for ${url}:`, errorReason);
+
+          // Log detailed error for debugging
+          if (errorReason instanceof Error) {
+            console.error(`  Error: ${errorReason.message}`);
+          }
+
           results.push(null);
         }
       }
