@@ -15,7 +15,8 @@ export const ConfigPage: React.FC = () => {
     llmModel: 'gpt-4o-mini',
     tavilyApiKey: '',
     jinaReaderApiKey: '',
-    scraperProvider: 'tavily' as 'tavily' | 'jina',
+    metasaReaderApiKey: '',
+    scraperProvider: 'tavily' as 'tavily' | 'jina' | 'metasa',
     initSampleRate: 0.2,
     maxCategories: 10,
     excludedDirs: '',
@@ -40,6 +41,7 @@ export const ConfigPage: React.FC = () => {
         llmModel: config.llmModel,
         tavilyApiKey: config.tavilyApiKey,
         jinaReaderApiKey: config.jinaReaderApiKey || '',
+        metasaReaderApiKey: config.metasaReaderApiKey || '',
         scraperProvider: config.scraperProvider || 'tavily',
         initSampleRate: config.initSampleRate,
         maxCategories: config.maxCategories,
@@ -87,6 +89,7 @@ export const ConfigPage: React.FC = () => {
         llmModel: localConfig.llmModel,
         tavilyApiKey: localConfig.tavilyApiKey,
         jinaReaderApiKey: localConfig.jinaReaderApiKey,
+        metasaReaderApiKey: localConfig.metasaReaderApiKey,
         scraperProvider: localConfig.scraperProvider,
         initSampleRate: localConfig.initSampleRate,
         maxCategories: localConfig.maxCategories,
@@ -238,17 +241,29 @@ export const ConfigPage: React.FC = () => {
           </div>
 
           <div className="form-group">
+            <label htmlFor="metasaReaderApiKey">Metasa AI Reader API Key</label>
+            <input
+              id="metasaReaderApiKey"
+              type="password"
+              value={localConfig.metasaReaderApiKey}
+              onChange={(e) => handleChange('metasaReaderApiKey', e.target.value)}
+              placeholder="Your Metasa API Key"
+            />
+          </div>
+
+          <div className="form-group">
             <label htmlFor="scraperProvider">Web Scraper Provider</label>
             <select
               id="scraperProvider"
               value={localConfig.scraperProvider}
-              onChange={(e) => handleChange('scraperProvider', e.target.value as 'tavily' | 'jina')}
+              onChange={(e) => handleChange('scraperProvider', e.target.value as 'tavily' | 'jina' | 'metasa')}
             >
               <option value="tavily">Tavily API</option>
               <option value="jina">Jina Reader API</option>
+              <option value="metasa">Metasa AI Reader API</option>
             </select>
             <small>
-              Choose the web scraper to fetch page content. Both require their respective API keys.
+              Choose the web scraper to fetch page content. Each requires its corresponding API key.
             </small>
           </div>
         </section>

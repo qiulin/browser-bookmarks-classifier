@@ -35,7 +35,7 @@ class ClassifierService {
 
       // Update services with current API keys and model
       scraperService.setProvider(config.scraperProvider);
-      scraperService.setApiKeys(config.tavilyApiKey, config.jinaReaderApiKey);
+      scraperService.setApiKeys(config.tavilyApiKey, config.jinaReaderApiKey, config.metasaReaderApiKey);
       openaiService.setBaseUrl(config.openaiBaseUrl);
       openaiService.setApiKey(config.openaiApiKey);
       openaiService.setModel(config.llmModel);
@@ -239,7 +239,7 @@ class ClassifierService {
 
     // Update services with current API keys and model
     scraperService.setProvider(config.scraperProvider);
-    scraperService.setApiKeys(config.tavilyApiKey, config.jinaReaderApiKey);
+    scraperService.setApiKeys(config.tavilyApiKey, config.jinaReaderApiKey, config.metasaReaderApiKey);
     openaiService.setBaseUrl(config.openaiBaseUrl);
     openaiService.setApiKey(config.openaiApiKey);
     openaiService.setModel(config.llmModel);

@@ -10,7 +10,12 @@ export interface ExtensionConfig {
 
   // Jina Reader Configuration
   jinaReaderApiKey: string;
-  scraperProvider: 'tavily' | 'jina';  // Which scraper to use
+
+  // Metasa AI Reader Configuration
+  metasaReaderApiKey: string;
+
+  // Scraper Provider Selection
+  scraperProvider: 'tavily' | 'jina' | 'metasa';  // Which scraper to use
 
   // Initialization Configuration
   initSampleRate: number;      // Sample rate, default 0.2 (20%)
@@ -39,6 +44,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   llmModel: 'gpt-4o-mini',
   tavilyApiKey: '',
   jinaReaderApiKey: '',
+  metasaReaderApiKey: '',
   scraperProvider: 'tavily',
   initSampleRate: 0.2,
   maxCategories: 10,
