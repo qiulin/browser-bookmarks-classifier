@@ -11,35 +11,142 @@
   padding: 2rem;
 }
 
-.popup-nav {
-  display: flex;
-  border-bottom: 1px solid #e0e0e0;
-  background: #f9f9f9;
+.popup-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
 }
 
-.nav-button {
-  flex: 1;
-  padding: 0.875rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  color: #555;
-  transition: all 0.2s;
-  border-bottom: 2px solid transparent;
+.popup-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
-.nav-button:hover {
-  background: #f0f0f0;
+.popup-subtitle {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
 }
 
-.nav-button.active {
-  color: #4a90e2;
-  border-bottom-color: #4a90e2;
-}
-
-.popup-main {
+.popup-content {
   padding: 1rem;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.menu-item:hover {
+  background: #f8f9fa;
+  border-color: #4a90e2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
+}
+
+.menu-item:active {
+  transform: translateY(0);
+}
+
+.menu-icon {
+  font-size: 1.75rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.menu-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.menu-desc {
+  font-size: 0.8rem;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menu-arrow {
+  font-size: 1.25rem;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.popup-status {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.status-row:last-child {
+  margin-bottom: 0;
+}
+
+.status-label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.active {
+  background: #cce5ff;
+  color: #004085;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 #popup-root {
