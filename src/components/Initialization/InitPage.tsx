@@ -69,11 +69,11 @@ export const InitPage: React.FC = () => {
       case 'backup':
         return 'Creating backup archive...';
       case 'sampling':
-        return 'Sampling bookmarks...';
+        return 'Sampling bookmarks for category creation...';
       case 'categorizing':
-        return 'Creating categories...';
+        return 'Analyzing samples and creating categories...';
       case 'classifying':
-        return `Classifying bookmarks: ${progress.current}/${progress.total}`;
+        return `Classifying bookmarks: ${progress.current} of ${progress.total}`;
       case 'complete':
         return 'Complete!';
       default:
@@ -81,7 +81,31 @@ export const InitPage: React.FC = () => {
     }
   };
 
+  const getStageInfo = () => {
+    if (!progress) return null;
+
+    const stages = [
+      { key: 'backup', label: 'Backup', icon: '📦' },
+      { key: 'sampling', label: 'Sampling', icon: '🔍' },
+      { key: 'categorizing', label: 'Creating Categories', icon: '📁' },
+      { key: 'classifying', label: 'Classifying', icon: '🏷️' },
+      { key: 'complete', label: 'Complete', icon: '✅' },
+    ] as const;
+
+    const currentStageIndex = stages.findIndex(s => s.key === progress.stage);
+
+    return stages.map((stage, index) => ({
+      ...stage,
+      status: index < currentStageIndex ? 'completed' :
+              index === currentStageIndex ? 'active' :
+              'pending',
+    }));
+  };
+
   if (stage === 'processing' || stage === 'complete') {
+    const stageInfo = getStageInfo();
+    const progressPercent = getProgressPercentage();
+
     return (
       <div className="init-page processing">
         <div className="processing-content">
@@ -91,20 +115,49 @@ export const InitPage: React.FC = () => {
           <h2>
             {stage === 'complete' ? 'Initialization Complete!' : 'Initializing...'}
           </h2>
+
+          {/* Overall progress bar */}
           {progress && (
             <>
-              <div className="progress-bar-container">
-                <div
-                  className="progress-bar-fill"
-                  style={{ width: `${getProgressPercentage()}%` }}
-                />
+              <div className="progress-overview">
+                <div className="progress-percentage">{progressPercent}%</div>
+                <div className="progress-bar-container">
+                  <div
+                    className="progress-bar-fill"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+                {progress.total > 0 && (
+                  <div className="progress-count">
+                    {progress.current} / {progress.total} bookmarks
+                  </div>
+                )}
               </div>
-              <p className="progress-text">{getStageText()}</p>
-              {progress.message && (
-                <p className="progress-message">{progress.message}</p>
+
+              {/* Stage indicators */}
+              {stageInfo && (
+                <div className="stage-indicators">
+                  {stageInfo.map((stage, index) => (
+                    <div key={index} className={`stage-indicator ${stage.status}`}>
+                      <div className="stage-icon">{stage.icon}</div>
+                      <div className="stage-info">
+                        <div className="stage-label">{stage.label}</div>
+                        {stage.status === 'active' && (
+                          <div className="stage-message">{progress.message || getStageText()}</div>
+                        )}
+                      </div>
+                      <div className="stage-status">
+                        {stage.status === 'completed' && '✓'}
+                        {stage.status === 'active' && '⟳'}
+                        {stage.status === 'pending' && '○'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </>
           )}
+
           {stage === 'complete' && (
             <button className="btn btn-primary" onClick={() => window.close()}>
               Close

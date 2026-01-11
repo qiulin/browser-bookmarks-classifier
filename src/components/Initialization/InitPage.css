@@ -148,10 +148,26 @@
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .status-icon {
   font-size: 4rem;
+}
+
+/* Progress Overview */
+.progress-overview {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.progress-percentage {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #4a90e2;
+  text-align: center;
 }
 
 .progress-bar-container {
@@ -167,6 +183,91 @@
   background: linear-gradient(90deg, #4a90e2, #357abd);
   transition: width 0.3s ease;
   border-radius: 12px;
+}
+
+.progress-count {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Stage Indicators */
+.stage-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.stage-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.stage-indicator.completed {
+  background: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.stage-indicator.active {
+  background: #cce5ff;
+  border-color: #4a90e2;
+  animation: stage-glow 2s ease-in-out infinite;
+}
+
+.stage-indicator.pending {
+  opacity: 0.6;
+}
+
+@keyframes stage-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+  }
+}
+
+.stage-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stage-info {
+  flex: 1;
+  text-align: left;
+}
+
+.stage-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.stage-message {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.stage-status {
+  font-size: 1.25rem;
+  width: 30px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .progress-text {
