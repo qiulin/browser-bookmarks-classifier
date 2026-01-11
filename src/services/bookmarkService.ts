@@ -275,23 +275,28 @@ class BookmarkService {
           existingFolderNames.add(sibling.title);
         }
       } else if (sibling.url) {
-        // Copy individual bookmark
-        await new Promise<void>((resolve, reject) => {
-          chrome.bookmarks.create(
-            {
-              title: sibling.title,
-              url: sibling.url,
-              parentId: backupFolderId,
-            },
-            () => {
-              if (chrome.runtime.lastError) {
-                reject(chrome.runtime.lastError);
-              } else {
-                resolve();
+        // Copy individual bookmark (check for duplicates by URL)
+        const duplicateExists = backupChildren.some(
+          c => c.url === sibling.url
+        );
+        if (!duplicateExists) {
+          await new Promise<void>((resolve, reject) => {
+            chrome.bookmarks.create(
+              {
+                title: sibling.title,
+                url: sibling.url,
+                parentId: backupFolderId,
+              },
+              () => {
+                if (chrome.runtime.lastError) {
+                  reject(chrome.runtime.lastError);
+                } else {
+                  resolve();
+                }
               }
-            }
-          );
-        });
+            );
+          });
+        }
       }
     }
 
