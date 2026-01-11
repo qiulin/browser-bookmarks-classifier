@@ -249,6 +249,20 @@ class ClassifierService {
     });
     await this._cleanupEmptyFolders(rootFolderId, [BACKUP_FOLDER_NAME, FAILURES_FOLDER_NAME, ...topLevelCategories]);
 
+    // Create TODO folder
+    progressCallback?.({
+      current: total,
+      total,
+      message: 'Creating TODO folder...',
+      stage: 'complete',
+    });
+    try {
+      await bookmarkService.createFolderPath(config.todoFolderName, rootFolderId);
+    } catch (error) {
+      // TODO folder might already exist, ignore error
+      console.info('TODO folder creation:', error);
+    }
+
     // Mark as initialized
     await storageService.setConfig({ isInitialized: true });
   }
