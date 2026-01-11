@@ -83,7 +83,7 @@ export interface ProgressUpdate {
   current: number;
   total: number;
   message: string;
-  stage: 'backup' | 'sampling' | 'categorizing' | 'classifying' | 'complete';
+  stage: 'idle' | 'backup' | 'sampling' | 'categorizing' | 'classifying' | 'complete';
 }
 
 // Message Types
@@ -91,6 +91,7 @@ export type MessageType =
   | 'GET_CONFIG'
   | 'SET_CONFIG'
   | 'START_INITIALIZATION'
+  | 'STOP_INITIALIZATION'
   | 'GET_PROGRESS'
   | 'CLASSIFY_BOOKMARK'
   | 'EXPORT_BOOKMARKS';
