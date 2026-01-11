@@ -179,7 +179,7 @@ chrome.bookmarks.onChanged.addListener(async (_id, _changeInfo) => {
 let heartbeat: number | undefined;
 
 function startHeartbeat() {
-  heartbeat = window.setInterval(() => {
+  heartbeat = self.setInterval(() => {
     chrome.storage.local.get('heartbeat', () => {
       // Just a no-op to keep the worker alive
     });
