@@ -172,8 +172,8 @@ export const InitPage: React.FC = () => {
           )}
 
           {stage === 'complete' && (
-            <button className="btn btn-primary" onClick={() => window.close()}>
-              Close
+            <button className="btn btn-primary" onClick={handleCancel}>
+              Done
             </button>
           )}
 
