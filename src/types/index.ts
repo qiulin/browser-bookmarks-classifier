@@ -8,6 +8,10 @@ export interface ExtensionConfig {
   // Tavily Configuration
   tavilyApiKey: string;
 
+  // Jina Reader Configuration
+  jinaReaderApiKey: string;
+  scraperProvider: 'tavily' | 'jina';  // Which scraper to use
+
   // Initialization Configuration
   initSampleRate: number;      // Sample rate, default 0.2 (20%)
   maxCategories: number;       // Maximum number of categories, default 10
@@ -34,6 +38,8 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   openaiApiKey: '',
   llmModel: 'gpt-4o-mini',
   tavilyApiKey: '',
+  jinaReaderApiKey: '',
+  scraperProvider: 'tavily',
   initSampleRate: 0.2,
   maxCategories: 10,
   excludedDirs: [],

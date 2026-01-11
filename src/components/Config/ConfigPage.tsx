@@ -14,6 +14,8 @@ export const ConfigPage: React.FC = () => {
     openaiApiKey: '',
     llmModel: 'gpt-4o-mini',
     tavilyApiKey: '',
+    jinaReaderApiKey: '',
+    scraperProvider: 'tavily' as 'tavily' | 'jina',
     initSampleRate: 0.2,
     maxCategories: 10,
     excludedDirs: '',
@@ -37,6 +39,8 @@ export const ConfigPage: React.FC = () => {
         openaiApiKey: config.openaiApiKey,
         llmModel: config.llmModel,
         tavilyApiKey: config.tavilyApiKey,
+        jinaReaderApiKey: config.jinaReaderApiKey || '',
+        scraperProvider: config.scraperProvider || 'tavily',
         initSampleRate: config.initSampleRate,
         maxCategories: config.maxCategories,
         excludedDirs: excludedDirsDisplay,
@@ -82,6 +86,8 @@ export const ConfigPage: React.FC = () => {
         openaiApiKey: localConfig.openaiApiKey,
         llmModel: localConfig.llmModel,
         tavilyApiKey: localConfig.tavilyApiKey,
+        jinaReaderApiKey: localConfig.jinaReaderApiKey,
+        scraperProvider: localConfig.scraperProvider,
         initSampleRate: localConfig.initSampleRate,
         maxCategories: localConfig.maxCategories,
         excludedDirs: excludedDirsArray,
@@ -218,6 +224,32 @@ export const ConfigPage: React.FC = () => {
               onChange={(e) => handleChange('tavilyApiKey', e.target.value)}
               placeholder="tvly-..."
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="jinaReaderApiKey">Jina Reader API Key</label>
+            <input
+              id="jinaReaderApiKey"
+              type="password"
+              value={localConfig.jinaReaderApiKey}
+              onChange={(e) => handleChange('jinaReaderApiKey', e.target.value)}
+              placeholder="jin-..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="scraperProvider">Web Scraper Provider</label>
+            <select
+              id="scraperProvider"
+              value={localConfig.scraperProvider}
+              onChange={(e) => handleChange('scraperProvider', e.target.value as 'tavily' | 'jina')}
+            >
+              <option value="tavily">Tavily API</option>
+              <option value="jina">Jina Reader API</option>
+            </select>
+            <small>
+              Choose the web scraper to fetch page content. Both require their respective API keys.
+            </small>
           </div>
         </section>
 

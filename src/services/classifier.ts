@@ -1,4 +1,4 @@
-import { tavilyService } from './tavilyService';
+import { scraperService } from './scraperService';
 import { openaiService } from './openaiService';
 import { bookmarkService } from './bookmarkService';
 import { storageService } from './storage';
@@ -34,7 +34,8 @@ class ClassifierService {
       const config = await storageService.getConfig();
 
       // Update services with current API keys and model
-      tavilyService.setApiKey(config.tavilyApiKey);
+      scraperService.setProvider(config.scraperProvider);
+      scraperService.setApiKeys(config.tavilyApiKey, config.jinaReaderApiKey);
       openaiService.setBaseUrl(config.openaiBaseUrl);
       openaiService.setApiKey(config.openaiApiKey);
       openaiService.setModel(config.llmModel);
@@ -237,7 +238,8 @@ class ClassifierService {
     const config = await storageService.getConfig();
 
     // Update services with current API keys and model
-    tavilyService.setApiKey(config.tavilyApiKey);
+    scraperService.setProvider(config.scraperProvider);
+    scraperService.setApiKeys(config.tavilyApiKey, config.jinaReaderApiKey);
     openaiService.setBaseUrl(config.openaiBaseUrl);
     openaiService.setApiKey(config.openaiApiKey);
     openaiService.setModel(config.llmModel);
@@ -274,7 +276,7 @@ class ClassifierService {
     language: string = 'en'
   ): Promise<{ path: string; folderId: string }> {
     // Fetch page content
-    const content = await tavilyService.fetchPageContent(bookmark.url!);
+    const content = await scraperService.fetchPageContent(bookmark.url!);
 
     if (signal?.aborted) throw new Error('Aborted');
 

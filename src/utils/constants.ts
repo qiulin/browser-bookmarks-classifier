@@ -1,5 +1,3 @@
-import { ExtensionConfig } from '../types';
-
 // Storage Keys
 export const STORAGE_KEY_CONFIG = 'bookmark_classifier_config';
 export const STORAGE_KEY_PROGRESS = 'bookmark_classifier_progress';
@@ -52,23 +50,6 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
   { code: 'ru', name: 'Russian', nativeName: 'Русский' },
 ] as const;
-
-// Default configuration
-export const DEFAULT_CONFIG: ExtensionConfig = {
-  openaiBaseUrl: 'https://api.openai.com/v1',
-  openaiApiKey: '',
-  llmModel: 'gpt-4o-mini',
-  tavilyApiKey: '',
-  initSampleRate: 0.2,
-  maxCategories: 10,
-  excludedDirs: [BACKUP_FOLDER_NAME, FAILURES_FOLDER_NAME],
-  maxDirectoryDepth: 2,
-  isInitialized: false,
-  isProcessing: false,
-  todoFolderName: DEFAULT_TODO_FOLDER_NAME,
-  checkInterval: 60000, // 1 minute in milliseconds
-  defaultLanguage: 'en', // Default to English
-};
 
 // System prompts for LLM
 export const CREATE_CATEGORIES_SYSTEM_PROMPT = `You are a bookmark categorization assistant. Analyze the provided bookmark samples and create appropriate category directories.
