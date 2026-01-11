@@ -22,10 +22,25 @@ export const RETRY_DELAY_MS = 1000;
 // Processing batch size
 export const BATCH_SIZE = 5;
 
+// Common LLM models
+export const COMMON_LLM_MODELS = [
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'OpenAI' },
+  { id: 'gpt-4o', name: 'GPT-4o', provider: 'OpenAI' },
+  { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', provider: 'OpenAI' },
+  { id: 'gpt-4', name: 'GPT-4', provider: 'OpenAI' },
+  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', provider: 'OpenAI' },
+  { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', provider: 'Anthropic' },
+  { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', provider: 'Anthropic' },
+  { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', provider: 'Anthropic' },
+  { id: 'deepseek-chat', name: 'DeepSeek Chat', provider: 'DeepSeek' },
+  { id: 'deepseek-coder', name: 'DeepSeek Coder', provider: 'DeepSeek' },
+] as const;
+
 // Default configuration
 export const DEFAULT_CONFIG: ExtensionConfig = {
   openaiBaseUrl: 'https://api.openai.com/v1',
   openaiApiKey: '',
+  llmModel: 'gpt-4o-mini',
   tavilyApiKey: '',
   initSampleRate: 0.2,
   maxCategories: 10,

@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { useStorage } from '../../hooks/useStorage';
+import { COMMON_LLM_MODELS } from '../../utils/constants';
 import './ConfigPage.css';
 
 export const ConfigPage: React.FC = () => {
   const { config, loading, updateConfig } = useStorage();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [customModel, setCustomModel] = useState(false);
 
   const [localConfig, setLocalConfig] = useState({
     openaiBaseUrl: '',
     openaiApiKey: '',
+    llmModel: 'gpt-4o-mini',
     tavilyApiKey: '',
     initSampleRate: 0.2,
     maxCategories: 10,
@@ -21,9 +24,12 @@ export const ConfigPage: React.FC = () => {
   // Update local config when global config loads
   React.useEffect(() => {
     if (config) {
+      const isCustomModel = !COMMON_LLM_MODELS.some(m => m.id === config.llmModel);
+      setCustomModel(isCustomModel);
       setLocalConfig({
         openaiBaseUrl: config.openaiBaseUrl,
         openaiApiKey: config.openaiApiKey,
+        llmModel: config.llmModel,
         tavilyApiKey: config.tavilyApiKey,
         initSampleRate: config.initSampleRate,
         maxCategories: config.maxCategories,
@@ -37,6 +43,12 @@ export const ConfigPage: React.FC = () => {
   const handleChange = (field: string, value: string | number) => {
     setLocalConfig(prev => ({ ...prev, [field]: value }));
     setMessage(null);
+
+    // Handle custom model selection
+    if (field === 'llmModel' && value === '__custom__') {
+      setCustomModel(true);
+      setLocalConfig(prev => ({ ...prev, llmModel: '' }));
+    }
   };
 
   const handleSave = async () => {
@@ -52,6 +64,7 @@ export const ConfigPage: React.FC = () => {
       await updateConfig({
         openaiBaseUrl: localConfig.openaiBaseUrl,
         openaiApiKey: localConfig.openaiApiKey,
+        llmModel: localConfig.llmModel,
         tavilyApiKey: localConfig.tavilyApiKey,
         initSampleRate: localConfig.initSampleRate,
         maxCategories: localConfig.maxCategories,
@@ -125,6 +138,57 @@ export const ConfigPage: React.FC = () => {
               onChange={(e) => handleChange('openaiApiKey', e.target.value)}
               placeholder="sk-..."
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="llmModel">LLM Model</label>
+            {!customModel && (
+              <select
+                id="llmModel"
+                value={localConfig.llmModel}
+                onChange={(e) => handleChange('llmModel', e.target.value)}
+              >
+                {COMMON_LLM_MODELS.map(model => (
+                  <option key={model.id} value={model.id}>
+                    {model.name} ({model.provider})
+                  </option>
+                ))}
+                <option value="__custom__">Custom Model...</option>
+              </select>
+            )}
+            {customModel && (
+              <div className="custom-model-input">
+                <input
+                  id="llmModel"
+                  type="text"
+                  value={localConfig.llmModel}
+                  onChange={(e) => handleChange('llmModel', e.target.value)}
+                  placeholder="Enter custom model name"
+                />
+                <button
+                  type="button"
+                  className="btn-small"
+                  onClick={() => {
+                    setCustomModel(false);
+                    handleChange('llmModel', 'gpt-4o-mini');
+                  }}
+                >
+                  Use Preset
+                </button>
+              </div>
+            )}
+            <small>
+              Choose a model or select "Custom Model..." to enter your own. Make sure your API provider supports the selected model.
+            </small>
+            {!customModel && (
+              <button
+                type="button"
+                className="text-link"
+                onClick={() => setCustomModel(true)}
+              >
+                Or use custom model
+              </button>
+            )}
           </div>
 
           <div className="form-group">

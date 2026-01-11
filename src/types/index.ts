@@ -3,6 +3,7 @@ export interface ExtensionConfig {
   // OpenAI Configuration
   openaiBaseUrl: string;
   openaiApiKey: string;
+  llmModel: string;          // LLM model name, default 'gpt-4o-mini'
 
   // Tavily Configuration
   tavilyApiKey: string;
@@ -27,6 +28,7 @@ export interface ExtensionConfig {
 export const DEFAULT_CONFIG: ExtensionConfig = {
   openaiBaseUrl: 'https://api.openai.com/v1',
   openaiApiKey: '',
+  llmModel: 'gpt-4o-mini',
   tavilyApiKey: '',
   initSampleRate: 0.2,
   maxCategories: 10,

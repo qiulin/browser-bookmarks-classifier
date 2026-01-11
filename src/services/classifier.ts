@@ -33,10 +33,11 @@ class ClassifierService {
     try {
       const config = await storageService.getConfig();
 
-      // Update services with current API keys
+      // Update services with current API keys and model
       tavilyService.setApiKey(config.tavilyApiKey);
       openaiService.setBaseUrl(config.openaiBaseUrl);
       openaiService.setApiKey(config.openaiApiKey);
+      openaiService.setModel(config.llmModel);
 
       await this._runInitialization(config, progressCallback);
     } finally {
@@ -202,10 +203,11 @@ class ClassifierService {
   ): Promise<{ path: string; folderId: string }> {
     const config = await storageService.getConfig();
 
-    // Update services with current API keys
+    // Update services with current API keys and model
     tavilyService.setApiKey(config.tavilyApiKey);
     openaiService.setBaseUrl(config.openaiBaseUrl);
     openaiService.setApiKey(config.openaiApiKey);
+    openaiService.setModel(config.llmModel);
 
     if (!bookmark.url) {
       throw new Error('Bookmark has no URL');

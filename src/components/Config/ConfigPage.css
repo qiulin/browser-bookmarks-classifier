@@ -68,19 +68,67 @@
 
 .form-group input[type="text"],
 .form-group input[type="password"],
-.form-group input[type="number"] {
+.form-group input[type="number"],
+.form-group select {
   width: 100%;
   padding: 0.625rem 0.75rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 0.95rem;
   transition: border-color 0.2s;
+  background: white;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: #4a90e2;
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+.custom-model-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.custom-model-input input {
+  flex: 1;
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btn-small:hover {
+  background: #e9ecef;
+  border-color: #bbb;
+}
+
+.text-link {
+  background: none;
+  border: none;
+  color: #4a90e2;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 0.375rem;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+.text-link:hover {
+  color: #3a7bc8;
 }
 
 .form-group input[type="range"] {
