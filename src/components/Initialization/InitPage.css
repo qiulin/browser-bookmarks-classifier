@@ -1,0 +1,267 @@
+.init-page {
+  min-width: 400px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Idle State */
+.init-page.idle {
+  text-align: center;
+}
+
+.idle-content h1 {
+  font-size: 1.75rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.idle-description {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.idle-status {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.status-value {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-value.initialized {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-value.not-initialized {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.reinit-note {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+/* Confirm State */
+.init-page.confirm {
+  background: #fffbeb;
+  border: 2px solid #fbbf24;
+  border-radius: 8px;
+}
+
+.confirm-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.confirm-content h2 {
+  color: #92400e;
+  margin: 0;
+}
+
+.confirm-warning {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  padding: 0.75rem;
+  border-radius: 4px;
+  color: #92400e;
+  margin: 0;
+}
+
+.confirm-info {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.confirm-info h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.confirm-info ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.confirm-info li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.confirm-export {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.confirm-export p {
+  margin: 0;
+  color: #555;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+/* Processing State */
+.init-page.processing {
+  text-align: center;
+}
+
+.processing-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.status-icon {
+  font-size: 4rem;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 24px;
+  background: #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4a90e2, #357abd);
+  transition: width 0.3s ease;
+  border-radius: 12px;
+}
+
+.progress-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.progress-message {
+  color: #666;
+  margin: 0;
+}
+
+/* Complete State */
+.init-page.processing .status-icon {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Error State */
+.init-page.error {
+  background: #fef2f2;
+  border: 2px solid #fca5a5;
+  border-radius: 8px;
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 3rem;
+}
+
+.error-content h2 {
+  color: #991b1b;
+  margin: 0;
+}
+
+.error-message {
+  color: #7f1d1d;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #4a90e2;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #3a7bc8;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #5a6268;
+}
