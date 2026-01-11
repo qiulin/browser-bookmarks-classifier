@@ -2,7 +2,7 @@ import { tavilyService } from './tavilyService';
 import { openaiService } from './openaiService';
 import { bookmarkService } from './bookmarkService';
 import { storageService } from './storage';
-import { BATCH_SIZE, FAILURES_FOLDER_NAME } from '../utils/constants';
+import { BATCH_SIZE, BACKUP_FOLDER_NAME, FAILURES_FOLDER_NAME } from '../utils/constants';
 import { sampleArray, batchArray, sleep } from '../utils/helpers';
 import type { ProgressUpdate, ExtensionConfig } from '../types';
 
@@ -208,6 +208,20 @@ class ClassifierService {
       stage: 'complete',
     });
 
+    // Clean up empty folders
+    progressCallback?.({
+      current: total,
+      total,
+      message: 'Cleaning up empty folders...',
+      stage: 'complete',
+    });
+    // Extract top-level category folder names
+    const topLevelCategories = categories.map(cat => {
+      const parts = cat.split('/');
+      return parts[0];
+    });
+    await this._cleanupEmptyFolders(rootFolderId, [BACKUP_FOLDER_NAME, FAILURES_FOLDER_NAME, ...topLevelCategories]);
+
     // Mark as initialized
     await storageService.setConfig({ isInitialized: true });
   }
@@ -360,6 +374,69 @@ class ClassifierService {
     }
 
     return categories;
+  }
+
+  /**
+   * Clean up empty folders after classification
+   * @param rootFolderId - Root folder ID to start cleanup from
+   * @param excludeFolders - Folder names to exclude from cleanup
+   */
+  private async _cleanupEmptyFolders(
+    rootFolderId: string,
+    excludeFolders: string[]
+  ): Promise<void> {
+    const tree = await bookmarkService.getTree();
+    const emptyFolderIds: string[] = [];
+
+    // Find all empty folders
+    function findEmptyFolders(node: chrome.bookmarks.BookmarkTreeNode, parentPath: string[] = []) {
+      const currentPath = [...parentPath, node.title];
+
+      if (!node.url && node.children) {
+        // Check if this is an excluded folder
+        if (excludeFolders.includes(node.title)) {
+          return;
+        }
+
+        // Check if folder is empty (no children or all children are empty folders)
+        const hasContent = node.children.some(child => {
+          if (child.url) return true; // Has bookmark
+          if (child.children && child.children.length > 0) {
+            // Has non-empty child folder
+            const childHasContent = child.children.some(c => c.url || (c.children && c.children.some(gc => gc.url)));
+            return childHasContent;
+          }
+          return false;
+        });
+
+        if (!hasContent && node.title !== '') {
+          emptyFolderIds.push(node.id);
+        }
+
+        // Recursively check children
+        for (const child of node.children) {
+          findEmptyFolders(child, currentPath);
+        }
+      }
+    }
+
+    for (const root of tree) {
+      if (root.children) {
+        for (const child of root.children) {
+          findEmptyFolders(child, []);
+        }
+      }
+    }
+
+    // Delete empty folders (in reverse order to handle nested empty folders)
+    for (const folderId of emptyFolderIds.reverse()) {
+      try {
+        await bookmarkService.removeBookmark(folderId);
+        console.log(`Removed empty folder: ${folderId}`);
+      } catch (error) {
+        console.error(`Failed to remove empty folder ${folderId}:`, error);
+      }
+    }
   }
 
   /**
