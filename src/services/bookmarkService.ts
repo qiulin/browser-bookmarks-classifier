@@ -1,4 +1,4 @@
-import { ARCHIVE_FOLDER_NAME } from '../utils/constants';
+import { BACKUP_FOLDER_NAME } from '../utils/constants';
 import { flattenBookmarks, isFolder, parsePath } from '../utils/helpers';
 
 /**
@@ -215,8 +215,8 @@ class BookmarkService {
   }
 
   /**
-   * Create Archive folder and backup all bookmarks
-   * @returns Archive folder ID
+   * Create Backup folder and backup all bookmarks
+   * @returns Backup folder ID
    */
   async createArchive(): Promise<string> {
     const tree = await this.getTree();
@@ -226,32 +226,32 @@ class BookmarkService {
     const defaultFolderId = rootChildren[0]?.id;
 
     if (!defaultFolderId) {
-      throw new Error('No suitable parent folder found for Archive');
+      throw new Error('No suitable parent folder found for Backup');
     }
 
-    // Check if Archive folder already exists
+    // Check if Backup folder already exists
     const siblings = await this.getBookmarksInFolder(defaultFolderId);
-    const archiveFolder = siblings.find(
-      (s) => isFolder(s) && s.title === ARCHIVE_FOLDER_NAME
+    const backupFolder = siblings.find(
+      (s) => isFolder(s) && s.title === BACKUP_FOLDER_NAME
     );
 
-    let archiveFolderId: string;
+    let backupFolderId: string;
 
-    if (archiveFolder) {
-      archiveFolderId = archiveFolder.id;
+    if (backupFolder) {
+      backupFolderId = backupFolder.id;
     } else {
-      const newArchive = await this.createFolder(ARCHIVE_FOLDER_NAME, defaultFolderId);
-      archiveFolderId = newArchive.id;
+      const newBackup = await this.createFolder(BACKUP_FOLDER_NAME, defaultFolderId);
+      backupFolderId = newBackup.id;
     }
 
-    // Backup all folders (except Archive itself)
+    // Backup all folders (except Backup itself)
     for (const sibling of siblings) {
-      if (isFolder(sibling) && sibling.title !== ARCHIVE_FOLDER_NAME) {
-        await this.copyBookmarkTree(sibling.id, archiveFolderId);
+      if (isFolder(sibling) && sibling.title !== BACKUP_FOLDER_NAME) {
+        await this.copyBookmarkTree(sibling.id, backupFolderId);
       }
     }
 
-    return archiveFolderId;
+    return backupFolderId;
   }
 
   /**

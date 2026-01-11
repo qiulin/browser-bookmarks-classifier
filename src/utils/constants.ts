@@ -7,8 +7,8 @@ export const STORAGE_KEY_PROGRESS = 'bookmark_classifier_progress';
 // API Endpoints
 export const TAVILY_API_ENDPOINT = 'https://api.tavily.com/search';
 
-// Archive folder name
-export const ARCHIVE_FOLDER_NAME = 'Archive';
+// Backup folder name
+export const BACKUP_FOLDER_NAME = 'Backup';
 
 // Default TODO folder name
 export const DEFAULT_TODO_FOLDER_NAME = 'TODO';
@@ -58,7 +58,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   tavilyApiKey: '',
   initSampleRate: 0.2,
   maxCategories: 10,
-  excludedDirs: [ARCHIVE_FOLDER_NAME],
+  excludedDirs: [BACKUP_FOLDER_NAME],
   maxDirectoryDepth: 2,
   isInitialized: false,
   isProcessing: false,
