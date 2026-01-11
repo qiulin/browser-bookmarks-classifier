@@ -187,11 +187,11 @@ class BookmarkService {
         targetParentId
       );
 
-      // Copy children recursively
-      if (source.children) {
-        for (const child of source.children) {
-          await this.copyBookmarkTree(child.id, folderCopy.id);
-        }
+      // Get children to copy recursively
+      const children = await this.getBookmarksInFolder(source.id);
+
+      for (const child of children) {
+        await this.copyBookmarkTree(child.id, folderCopy.id);
       }
     } else if (source.url) {
       // Create bookmark copy
