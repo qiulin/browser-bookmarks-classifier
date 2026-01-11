@@ -244,6 +244,14 @@ class BookmarkService {
       backupFolderId = newBackup.id;
     }
 
+    // Get existing folders in Backup to check for duplicates
+    const backupChildren = await this.getBookmarksInFolder(backupFolderId);
+    const existingFolderNames = new Set(
+      backupChildren
+        .filter(c => isFolder(c))
+        .map(c => c.title)
+    );
+
     // Backup all items (folders and bookmarks, except Backup itself)
     for (const sibling of siblings) {
       if (sibling.title === BACKUP_FOLDER_NAME) {
@@ -251,8 +259,21 @@ class BookmarkService {
       }
 
       if (isFolder(sibling)) {
-        // Copy entire folder tree
-        await this.copyBookmarkTree(sibling.id, backupFolderId);
+        // Check if folder already exists in Backup
+        if (existingFolderNames.has(sibling.title)) {
+          // Find existing folder and merge content into it
+          const existingFolder = backupChildren.find(
+            c => isFolder(c) && c.title === sibling.title
+          );
+          if (existingFolder) {
+            // Merge content into existing folder
+            await this.mergeBookmarkTree(sibling.id, existingFolder.id);
+          }
+        } else {
+          // Copy entire folder tree (new folder)
+          await this.copyBookmarkTree(sibling.id, backupFolderId);
+          existingFolderNames.add(sibling.title);
+        }
       } else if (sibling.url) {
         // Copy individual bookmark
         await new Promise<void>((resolve, reject) => {
@@ -275,6 +296,74 @@ class BookmarkService {
     }
 
     return backupFolderId;
+  }
+
+  /**
+   * Merge a bookmark tree into an existing folder
+   * @param sourceId - Source folder or bookmark ID
+   * @param targetParentId - Target parent folder ID
+   */
+  async mergeBookmarkTree(
+    sourceId: string,
+    targetParentId: string
+  ): Promise<void> {
+    const source = await this.getBookmark(sourceId);
+
+    if (isFolder(source)) {
+      // Get existing folders in target to check for duplicates
+      const targetChildren = await this.getBookmarksInFolder(targetParentId);
+      const existingFolderNames = new Set(
+        targetChildren
+          .filter(c => isFolder(c))
+          .map(c => c.title)
+      );
+
+      // Get children to merge recursively
+      const children = await this.getBookmarksInFolder(source.id);
+
+      for (const child of children) {
+        if (isFolder(child)) {
+          // Check if subfolder already exists
+          if (existingFolderNames.has(child.title)) {
+            // Merge into existing subfolder
+            const existingFolder = targetChildren.find(
+              c => isFolder(c) && c.title === child.title
+            );
+            if (existingFolder) {
+              await this.mergeBookmarkTree(child.id, existingFolder.id);
+            }
+          } else {
+            // Create new subfolder
+            const newFolder = await this.createFolder(child.title, targetParentId);
+            await this.mergeBookmarkTree(child.id, newFolder.id);
+            existingFolderNames.add(child.title);
+          }
+        } else if (child.url) {
+          // Copy bookmark (check for duplicates by URL)
+          const duplicateExists = targetChildren.some(
+            c => c.url === child.url
+          );
+          if (!duplicateExists) {
+            await new Promise<void>((resolve, reject) => {
+              chrome.bookmarks.create(
+                {
+                  title: child.title,
+                  url: child.url,
+                  parentId: targetParentId,
+                },
+                () => {
+                  if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                  } else {
+                    resolve();
+                  }
+                }
+              );
+            });
+          }
+        }
+      }
+    }
   }
 
   /**
