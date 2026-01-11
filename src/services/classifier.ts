@@ -2,6 +2,7 @@ import { scraperService } from './scraperService';
 import { openaiService } from './openaiService';
 import { bookmarkService } from './bookmarkService';
 import { storageService } from './storage';
+import { rulesService } from './rulesService';
 import { BATCH_SIZE, BACKUP_FOLDER_NAME, FAILURES_FOLDER_NAME } from '../utils/constants';
 import { sampleArray, batchArray, sleep } from '../utils/helpers';
 import type { ProgressUpdate, ExtensionConfig } from '../types';
@@ -41,6 +42,18 @@ class ClassifierService {
       openaiService.setModel(config.llmModel);
 
       await this._runInitialization(config, progressCallback);
+    } catch (error) {
+      // Handle abort as normal cancellation, not an error
+      if (error instanceof Error && error.message === 'Aborted') {
+        progressCallback?.({
+          current: 0,
+          total: 0,
+          message: 'Initialization cancelled by user',
+          stage: 'complete',
+        });
+        return;
+      }
+      throw error; // Re-throw other errors
     } finally {
       this.isProcessing = false;
       this.abortController = null;
@@ -158,6 +171,9 @@ class ClassifierService {
     const existingCategories = Object.keys(categoryIds);
     const concurrency = config.classificationConcurrency || 10;
 
+    // Parse custom rules
+    const rules = rulesService.getRules(config);
+
     // Filter bookmarks with URLs
     const bookmarksToClassify = allBookmarks.filter(b => b.url);
 
@@ -191,7 +207,8 @@ class ClassifierService {
               config.maxDirectoryDepth,
               rootFolderId,
               signal,
-              config.defaultLanguage
+              config.defaultLanguage,
+              rules
             );
 
             // Check abort before moving
@@ -328,13 +345,17 @@ class ClassifierService {
 
     const rootFolderId = await bookmarkService.getDefaultFolderId();
 
+    // Parse custom rules
+    const rules = rulesService.getRules(config);
+
     return this._classifySingleBookmark(
       bookmark,
       categories,
       config.maxDirectoryDepth,
       rootFolderId,
       undefined,
-      config.defaultLanguage
+      config.defaultLanguage,
+      rules
     );
   }
 
@@ -347,7 +368,8 @@ class ClassifierService {
     maxDepth: number,
     rootFolderId: string,
     signal?: AbortSignal,
-    language: string = 'en'
+    language: string = 'en',
+    rules: any[] = []
   ): Promise<{ path: string; folderId: string }> {
     // Check abort before starting
     if (signal?.aborted) throw new Error('Aborted');
@@ -356,6 +378,16 @@ class ClassifierService {
     const content = await scraperService.fetchPageContent(bookmark.url!);
 
     if (signal?.aborted) throw new Error('Aborted');
+
+    // Check custom rules first
+    const ruleMatch = rulesService.matchRule(bookmark, content.content, rules);
+    if (ruleMatch) {
+      const folderId = await bookmarkService.getOrCreateFolder(ruleMatch, rootFolderId);
+      return {
+        path: ruleMatch,
+        folderId,
+      };
+    }
 
     // Classify using OpenAI
     const result = await openaiService.classifyBookmark(

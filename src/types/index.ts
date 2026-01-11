@@ -22,6 +22,7 @@ export interface ExtensionConfig {
   maxCategories: number;       // Maximum number of categories, default 10
   excludedDirs: string[];      // List of directory names to exclude
   classificationConcurrency: number;  // Number of concurrent classifications, default 10
+  customRules: string;         // Custom classification rules (markdown format)
 
   // Directory Depth
   maxDirectoryDepth: number;   // Maximum directory depth, default 2
@@ -51,6 +52,7 @@ export const DEFAULT_CONFIG: ExtensionConfig = {
   maxCategories: 10,
   excludedDirs: [],
   classificationConcurrency: 10,
+  customRules: '',
   maxDirectoryDepth: 2,
   isInitialized: false,
   isProcessing: false,

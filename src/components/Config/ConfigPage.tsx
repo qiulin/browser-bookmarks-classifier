@@ -21,6 +21,7 @@ export const ConfigPage: React.FC = () => {
     maxCategories: 10,
     excludedDirs: '',
     classificationConcurrency: 10,
+    customRules: '',
     maxDirectoryDepth: 2,
     todoFolderName: 'TODO',
     checkInterval: 60000,
@@ -48,6 +49,7 @@ export const ConfigPage: React.FC = () => {
         maxCategories: config.maxCategories,
         excludedDirs: excludedDirsDisplay,
         classificationConcurrency: config.classificationConcurrency || 10,
+        customRules: config.customRules || '',
         maxDirectoryDepth: config.maxDirectoryDepth,
         todoFolderName: config.todoFolderName,
         checkInterval: config.checkInterval,
@@ -97,6 +99,7 @@ export const ConfigPage: React.FC = () => {
         maxCategories: localConfig.maxCategories,
         excludedDirs: excludedDirsArray,
         classificationConcurrency: localConfig.classificationConcurrency,
+        customRules: localConfig.customRules,
         maxDirectoryDepth: localConfig.maxDirectoryDepth,
         todoFolderName: localConfig.todoFolderName,
         checkInterval: localConfig.checkInterval,
@@ -314,6 +317,30 @@ export const ConfigPage: React.FC = () => {
               onChange={(e) => handleChange('classificationConcurrency', parseInt(e.target.value))}
             />
             <small>Number of bookmarks to classify simultaneously (default: 10)</small>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="customRules">Custom Classification Rules</label>
+            <textarea
+              id="customRules"
+              rows={10}
+              value={localConfig.customRules}
+              onChange={(e) => handleChange('customRules', e.target.value)}
+              placeholder={`Examples:
+- 如果是个人博客首页，则分类为 个人博客
+- If URL contains github.com, classify as 开发工具
+- 如果域名是 twitter.com，则分类为 社交媒体
+- If title contains "tutorial", classify as 学习资源`}
+              className="rules-textarea"
+            />
+            <small>
+              Custom rules in markdown format (one per line). Rules are checked before AI classification.
+              <br />
+              <strong>Supported patterns:</strong>
+              <br />- 如果是 URL包含/标题包含/域名/路径/内容包含，则分类为 [category]
+              <br />- If URL contains/title contains/domain/path/content contains, classify as [category]
+              <br />- 如果是首页，则分类为 [category] (If homepage, classify as)
+            </small>
           </div>
 
           <div className="form-group">
